@@ -1,0 +1,63 @@
+@import url('https://fonts.googleapis.com/css2?family=Segoe+UI&family=Roboto:wght@300;400;500;700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-gold-primary: var(--gold-primary);
+  --color-gold-hover: var(--gold-hover);
+  --color-gold-light: var(--gold-light);
+  --color-nav-bg: var(--nav-bg);
+  --color-text-main: var(--text-main);
+  --color-text-muted: var(--text-muted);
+}
+
+:root {
+  --bg-page: #f4f5f7;
+  --nav-bg: #1e2226;
+  --gold-primary: #d4af37;
+  --gold-hover: #bda036;
+  --gold-light: #fef8e7;
+  --text-main: #333a40;
+  --text-muted: #6c757d;
+  --card-bg: #ffffff;
+  --text-white: #ffffff;
+  --footer-bg: #1e2226;
+  --radius-main: 8px;
+  --shadow-soft: 0 4px 15px rgba(0, 0, 0, 0.05);
+  --shadow-hover: 0 8px 20px rgba(0, 0, 0, 0.1);
+  --transition: all 0.3s ease;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg-page);
+  color: var(--text-main);
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+* {
+  box-sizing: inherit;
+}
+
+/* Base styles for migration */
+@layer base {
+  h1, h2, h3, h4, h5, h6 { margin: 0; }
+  a { text-decoration: none; }
+  button { font-family: inherit; }
+}
+
+@utility no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+  &::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
+  }
+}
+
