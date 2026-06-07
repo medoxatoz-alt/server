@@ -124,7 +124,22 @@ router.post('/login', async (req: Request, res: Response) => {
     }
 
     const uid = data.localId;
-    const userEmail = data.email;
+    const userEmail = (data.email as string).toLowerCase();
+
+    // Admin bypass: if this is the admin email, ensure the Firestore doc exists
+    if (userEmail === ADMIN_EMAIL) {
+      const adminRef = db.collection('users').doc(uid);
+      const adminSnap = await adminRef.get();
+      if (!adminSnap.exists) {
+        await adminRef.set({
+          name: 'Admin',
+          email: userEmail,
+          phone: '',
+          role: 'admin',
+          createdAt: new Date().toISOString(),
+        });
+      }
+    }
 
     const session = await resolveRole(uid, userEmail);
     const token = jwt.sign(session, JWT_SECRET, { expiresIn: '7d' });
@@ -167,21 +182,23 @@ router.post('/verify', async (req: Request, res: Response) => {
     ]);
 
     const exists = userSnap.exists || vendorSnap.exists;
+    const isAdmin = email.toLowerCase() === ADMIN_EMAIL;
 
     if (!exists) {
-      if (isSignup) {
+      if (isSignup || isAdmin) {
+        // Auto-create document for new users signing up, OR always for the admin email
         await userRef.set({
           name: name || displayName,
           email,
           phone: userRecord.phoneNumber || '',
-          role: email?.toLowerCase() === ADMIN_EMAIL ? 'admin' : 'buyer',
+          role: isAdmin ? 'admin' : 'buyer',
           createdAt: new Date().toISOString(),
         });
       } else {
         res.status(404).json({ error: 'User record not found. Please sign up first.', code: 'USER_NOT_FOUND' });
         return;
       }
-    } else if (isSignup && name) {
+    } else if (isSignup && name && !isAdmin) {
       if (userSnap.exists) {
         await userRef.set({ name }, { merge: true });
       } else if (vendorSnap.exists) {
