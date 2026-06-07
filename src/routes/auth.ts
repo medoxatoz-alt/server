@@ -1,0 +1,223 @@
+// src/routes/auth.ts
+// Handles login (email/password + Google), logout, and /me
+
+import { Router, Request, Response } from 'express';
+import jwt from 'jsonwebtoken';
+import { auth, db } from '../firebase';
+import { verifyToken } from '../middleware/verifyToken';
+import { UserSession } from '../types';
+
+const router = Router();
+const JWT_SECRET = process.env.JWT_SECRET!;
+const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || '').toLowerCase();
+
+const isProduction = process.env.NODE_ENV === 'production';
+const COOKIE_OPTS = {
+  httpOnly: true,
+  secure: isProduction,
+  sameSite: (isProduction ? 'none' : 'lax') as 'none' | 'lax',
+  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  path: '/',
+};
+
+// Helper: resolve role from Firestore
+async function resolveRole(uid: string, email: string): Promise<UserSession> {
+  const lowerEmail = email.toLowerCase();
+
+  if (lowerEmail === ADMIN_EMAIL) {
+    return { uid, email, role: 'admin' };
+  }
+
+  // Check vendor collection
+  const vendorSnap = await db.collection('vendors').doc(uid).get();
+  if (vendorSnap.exists) {
+    const vdata = vendorSnap.data()!;
+    return {
+      uid,
+      email,
+      name: vdata.storeName || vdata.name,
+      role: 'vendor',
+      status: vdata.status ?? 'pending',
+    };
+  }
+
+  // Default buyer
+  const userSnap = await db.collection('users').doc(uid).get();
+  const udata = userSnap.exists ? userSnap.data()! : {};
+  return {
+    uid,
+    email,
+    name: udata.name,
+    role: 'buyer',
+  };
+}
+
+// POST /api/auth/register  —  Email + Password Register
+router.post('/register', async (req: Request, res: Response) => {
+  const { name, email, password } = req.body as { name: string; email: string; password: string };
+
+  if (!name || !email || !password) {
+    res.status(400).json({ error: 'Name, email, and password are required.' });
+    return;
+  }
+
+  try {
+    const userRecord = await auth.createUser({
+      email,
+      password,
+      displayName: name,
+    });
+    
+    const uid = userRecord.uid;
+    const userEmail = userRecord.email!;
+
+    // Create user document in Firestore
+    await db.collection('users').doc(uid).set({
+      name,
+      email: userEmail.toLowerCase(),
+      phone: '',
+      role: 'buyer',
+      createdAt: new Date().toISOString(),
+    });
+
+    const session = await resolveRole(uid, userEmail);
+    const token = jwt.sign(session, JWT_SECRET, { expiresIn: '7d' });
+
+    res.cookie('medox_token', token, COOKIE_OPTS);
+    res.status(201).json({ success: true, user: session });
+  } catch (err: any) {
+    console.error('Register error:', err);
+    const code = err.code;
+    let msg = 'Registration failed. Please try again.';
+    if (code === 'auth/email-already-exists') {
+      msg = 'This email address is already registered.';
+    } else if (code === 'auth/invalid-password') {
+      msg = 'Password should be at least 6 characters.';
+    } else if (code === 'auth/invalid-email') {
+      msg = 'Invalid email address format.';
+    }
+    res.status(400).json({ error: msg });
+  }
+});
+
+// POST /api/auth/login  —  Email + Password
+router.post('/login', async (req: Request, res: Response) => {
+  const { email, password } = req.body as { email: string; password: string };
+
+  if (!email || !password) {
+    res.status(400).json({ error: 'Email and password are required.' });
+    return;
+  }
+
+  try {
+    // Admin SDK cannot sign in users, so we use the Auth REST API to verify credentials
+    const apiKey = process.env.FIREBASE_API_KEY;
+    const response = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, returnSecureToken: true }),
+    });
+
+    const data: any = await response.json();
+    if (data.error) {
+      throw new Error(data.error.message);
+    }
+
+    const uid = data.localId;
+    const userEmail = data.email;
+
+    const session = await resolveRole(uid, userEmail);
+    const token = jwt.sign(session, JWT_SECRET, { expiresIn: '7d' });
+
+    res.cookie('medox_token', token, COOKIE_OPTS);
+    res.json({ success: true, user: session });
+  } catch (err: any) {
+    const msg = err.message.includes('INVALID_LOGIN_CREDENTIALS')
+        ? 'Incorrect email or password.'
+        : err.message.includes('TOO_MANY_ATTEMPTS')
+        ? 'Too many attempts. Try again later.'
+        : 'Login failed. Please try again.';
+    res.status(401).json({ error: msg });
+  }
+});
+
+// POST /api/auth/verify  —  Verify Firebase ID Token (from Google/OTP) and create session
+router.post('/verify', async (req: Request, res: Response) => {
+  const { idToken, name, isSignup } = req.body as { idToken: string; name?: string; isSignup?: boolean };
+
+  if (!idToken) {
+    res.status(400).json({ error: 'Firebase ID token is required.' });
+    return;
+  }
+
+  try {
+    const decodedToken = await auth.verifyIdToken(idToken);
+    const uid = decodedToken.uid;
+    const userRecord = await auth.getUser(uid);
+
+    const email = userRecord.email || `${userRecord.phoneNumber}@phone.auth.medox`; // Fallback for phone auth without email
+    const displayName = userRecord.displayName || 'User';
+
+    const userRef = db.collection('users').doc(uid);
+    const vendorRef = db.collection('vendors').doc(uid);
+
+    const [userSnap, vendorSnap] = await Promise.all([
+      userRef.get(),
+      vendorRef.get(),
+    ]);
+
+    const exists = userSnap.exists || vendorSnap.exists;
+
+    if (!exists) {
+      if (isSignup) {
+        await userRef.set({
+          name: name || displayName,
+          email,
+          phone: userRecord.phoneNumber || '',
+          role: email?.toLowerCase() === ADMIN_EMAIL ? 'admin' : 'buyer',
+          createdAt: new Date().toISOString(),
+        });
+      } else {
+        res.status(404).json({ error: 'User record not found. Please sign up first.', code: 'USER_NOT_FOUND' });
+        return;
+      }
+    } else if (isSignup && name) {
+      if (userSnap.exists) {
+        await userRef.set({ name }, { merge: true });
+      } else if (vendorSnap.exists) {
+        await vendorRef.set({ storeName: name }, { merge: true });
+      }
+    }
+
+    const session = await resolveRole(uid, email);
+    const token = jwt.sign(session, JWT_SECRET, { expiresIn: '7d' });
+
+    res.cookie('medox_token', token, COOKIE_OPTS);
+    res.json({ success: true, user: session });
+  } catch (err: any) {
+    console.error('Verify error:', err);
+    res.status(401).json({ error: 'Authentication failed. Invalid token.' });
+  }
+});
+
+// GET /api/auth/me  —  Return current session user
+router.get('/me', verifyToken, async (req: Request, res: Response) => {
+  try {
+    const session = await resolveRole(req.user!.uid, req.user!.email);
+    res.json({ user: session });
+  } catch {
+    res.status(500).json({ error: 'Failed to refresh session.' });
+  }
+});
+
+// POST /api/auth/logout
+router.post('/logout', (_req: Request, res: Response) => {
+  res.clearCookie('medox_token', { 
+    path: '/',
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax'
+  });
+  res.json({ success: true });
+});
+
+export default router;
