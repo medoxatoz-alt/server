@@ -9,15 +9,16 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
 
-import authRoutes    from './routes/auth';
-import productRoutes from './routes/products';
-import cartRoutes    from './routes/cart';
-import orderRoutes   from './routes/orders';
-import vendorRoutes  from './routes/vendors';
-import adminRoutes   from './routes/admin';
-import uploadRoutes  from './routes/upload';
-import userRoutes    from './routes/user';
-import reviewsRoutes from './routes/reviews';
+import authRoutes     from './routes/auth';
+import productRoutes  from './routes/products';
+import cartRoutes     from './routes/cart';
+import orderRoutes    from './routes/orders';
+import vendorRoutes   from './routes/vendors';
+import adminRoutes    from './routes/admin';
+import uploadRoutes   from './routes/upload';
+import userRoutes     from './routes/user';
+import reviewsRoutes  from './routes/reviews';
+import paymentRoutes  from './routes/payments';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -77,6 +78,7 @@ app.use('/api/admin',    adminRoutes);
 app.use('/api/upload',   uploadRoutes);
 app.use('/api/user',     userRoutes);
 app.use('/api/reviews',  reviewsRoutes);
+app.use('/api/payments', paymentRoutes);
 
 // ─── Health Check ────────────────────────────────────────────────────────────
 app.get('/api/health', (_req, res) => {
@@ -90,6 +92,7 @@ app.use((_req, res) => {
 
 // ─── Global Error Handler ────────────────────────────────────────────────────
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  require('fs').appendFileSync('error.log', new Date().toISOString() + ' ' + err.stack + '\n');
   console.error('[Server Error]', err.message);
   res.status(500).json({ error: 'Internal server error.' });
 });

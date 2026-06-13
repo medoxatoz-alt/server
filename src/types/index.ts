@@ -62,6 +62,8 @@ export interface Order {
   confirmedOrderId?: string;
   createdAt: string;
   timeline?: Array<{ status: string; timestamp: string }>;
+  trackingId?: string;
+  trackingLink?: string;
 }
 
 export interface VendorProfile {

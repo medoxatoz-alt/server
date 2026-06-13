@@ -14,7 +14,14 @@ router.get('/', async (_req: Request, res: Response) => {
   try {
     const snap = await db.collection('products').get();
     const products: Product[] = snap.docs.map(d => ({ id: d.id, ...d.data() } as Product));
-    res.json(products);
+
+    // Fetch all rejected vendors
+    const rejectedVendorsSnap = await db.collection('vendors').where('status', '==', 'rejected').get();
+    const rejectedVendorIds = new Set(rejectedVendorsSnap.docs.map(doc => doc.id));
+
+    // Filter out products of rejected vendors
+    const filteredProducts = products.filter(p => !p.vendorId || !rejectedVendorIds.has(p.vendorId));
+    res.json(filteredProducts);
   } catch {
     res.status(500).json({ error: 'Failed to fetch products.' });
   }
@@ -32,8 +39,15 @@ router.post('/bulk', async (req: Request, res: Response) => {
     const snaps = await Promise.all(fetches);
     const products = snaps
       .filter(s => s.exists)
-      .map(s => ({ id: s.id, ...s.data() }));
-    res.json(products);
+      .map(s => ({ id: s.id, ...s.data() } as Product));
+
+    // Fetch all rejected vendors
+    const rejectedVendorsSnap = await db.collection('vendors').where('status', '==', 'rejected').get();
+    const rejectedVendorIds = new Set(rejectedVendorsSnap.docs.map(doc => doc.id));
+
+    // Filter out products of rejected vendors
+    const filteredProducts = products.filter(p => !p.vendorId || !rejectedVendorIds.has(p.vendorId));
+    res.json(filteredProducts);
   } catch {
     res.status(500).json({ error: 'Failed to fetch products.' });
   }
@@ -47,7 +61,16 @@ router.get('/:id', async (req: Request, res: Response) => {
       res.status(404).json({ error: 'Product not found.' });
       return;
     }
-    res.json({ id: snap.id, ...snap.data() });
+    const productData = snap.data() as Product;
+    const vendorId = productData.vendorId;
+    if (vendorId && vendorId !== 'admin') {
+      const vendorSnap = await db.collection('vendors').doc(vendorId).get();
+      if (vendorSnap.exists && vendorSnap.data()?.status === 'rejected') {
+        res.status(403).json({ error: 'Vendor is no longer available' });
+        return;
+      }
+    }
+    res.json({ id: snap.id, ...productData });
   } catch {
     res.status(500).json({ error: 'Failed to fetch product.' });
   }
@@ -111,21 +134,33 @@ router.put('/:id', verifyToken, requireVendor, async (req: Request, res: Respons
     const body = req.body;
 
     // Re-normalise images on edit too
-    const imagesArray: string[] = Array.isArray(body.images) && body.images.length > 0
+    const rawImagesArray = Array.isArray(body.images) && body.images.length > 0
       ? body.images
-      : body.image ? [body.image] : [];
-    const thumbnail: string = body.thumbnail || imagesArray[0] || '';
+      : Array.isArray(body.image) ? body.image : body.image ? [body.image] : [];
+    
+    // Ensure it's a flat array of strings
+    const imagesArray: string[] = rawImagesArray.flat().filter((img: any) => typeof img === 'string' && img.trim() !== '');
+
+    const thumbnail: string = typeof body.thumbnail === 'string' && body.thumbnail.trim() !== ''
+        ? body.thumbnail 
+        : imagesArray[0] || '';
+
+    // Remove any undefined values that somehow snuck in
+    const cleanBody = Object.fromEntries(
+      Object.entries(body).filter(([_, v]) => v !== undefined && v !== null && !Number.isNaN(v))
+    );
 
     await productRef.set({
-      ...body,
+      ...cleanBody,
       images: imagesArray,
       image:  thumbnail,
       thumbnail,
       updatedAt: new Date().toISOString(),
     }, { merge: true });
     res.json({ success: true });
-  } catch {
-    res.status(500).json({ error: 'Failed to update product.' });
+  } catch (err: any) {
+    console.error('Update Product Error:', err);
+    res.status(500).json({ error: 'Failed to update product.', details: err.message });
   }
 });
 

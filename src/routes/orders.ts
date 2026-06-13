@@ -7,6 +7,9 @@ import { verifyToken } from '../middleware/verifyToken';
 import { requireAdmin } from '../middleware/requireAdmin';
 import { Order, OrderItem } from '../types';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const Razorpay = require('razorpay');
+
 const router = Router();
 
 // ─────────────────────────────────────────────────────────
@@ -73,35 +76,55 @@ router.post('/', verifyToken, async (req: Request, res: Response) => {
     paymentMethod: string;
   };
 
+  // 0. Consolidate duplicate cart items to prevent stock check bypass exploit
+  const consolidatedCart = new Map<string, number>();
+  for (const item of cartItems) {
+    if (!item.productId) continue;
+    const currentQty = consolidatedCart.get(item.productId) || 0;
+    consolidatedCart.set(item.productId, currentQty + (Number(item.quantity) || 0));
+  }
+  
+  const finalCartItems = Array.from(consolidatedCart.entries())
+    .map(([productId, quantity]) => ({ productId, quantity }))
+    .filter(item => item.quantity > 0);
+
+  if (finalCartItems.length === 0) {
+    res.status(400).json({ error: 'Cart is empty or invalid.' });
+    return;
+  }
+
   try {
     const createdOrderIds = await db.runTransaction(async (transaction) => {
       // 1. Read all product docs in the transaction
-      const productRefs = cartItems.map(item => db.collection('products').doc(String(item.productId)));
-      const productSnaps = await Promise.all(productRefs.map(ref => transaction.get(ref)));
-
-      // 2. Validate stock levels
-      const productsData: Array<{ id: string; ref: admin.firestore.DocumentReference; data: any; qty: number }> = [];
-      for (let i = 0; i < productSnaps.length; i++) {
-        const snap = productSnaps[i];
+      const productDocs = new Map<string, admin.firestore.DocumentSnapshot>();
+      
+      for (const item of finalCartItems) {
+        const ref = db.collection('products').doc(String(item.productId));
+        const snap = await transaction.get(ref);
         if (!snap.exists) {
           throw new Error('PRODUCT_NOT_FOUND');
         }
+        
         const p = snap.data()!;
-        const qty = cartItems[i].quantity;
         const stock = Number(p.stock) || 0;
-        if (stock < qty) {
+        if (stock < item.quantity) {
           throw new Error(`INSUFFICIENT_STOCK|${p.title}|${stock}`);
         }
-        productsData.push({ id: snap.id, ref: snap.ref, data: p, qty });
+        productDocs.set(item.productId, snap);
       }
 
       // 3. Deduct stock and write orders
       const timestamp = new Date().toISOString();
       const orderIdBase = `ORD-${Math.floor(100000 + Math.random() * 900000)}`;
-      const orderIds: string[] = [];
+      const innerCreatedOrderIds: string[] = [];
 
-      for (let i = 0; i < productsData.length; i++) {
-        const { id, ref, data: p, qty } = productsData[i];
+      let i = 0;
+      for (const cartItem of finalCartItems) {
+        const id = cartItem.productId;
+        const qty = cartItem.quantity;
+        const snap = productDocs.get(id)!;
+        const p = snap.data()!;
+        const ref = snap.ref;
         const price = typeof p.price === 'string' ? parseFloat(p.price.replace(/,/g, '')) : Number(p.price) || 0;
         const vendorId = p.vendorId || 'admin';
 
@@ -141,10 +164,11 @@ router.post('/', verifyToken, async (req: Request, res: Response) => {
         };
 
         transaction.set(newOrderRef, orderData);
-        orderIds.push(newOrderRef.id);
+        innerCreatedOrderIds.push(newOrderRef.id);
+        i++;
       }
 
-      return orderIds;
+      return innerCreatedOrderIds;
     });
 
     res.status(201).json({ success: true, orderIds: createdOrderIds });
@@ -166,7 +190,11 @@ router.post('/', verifyToken, async (req: Request, res: Response) => {
 // Strict ownership + valid transition enforcement
 // ─────────────────────────────────────────────────────────
 router.patch('/:id', verifyToken, async (req: Request, res: Response) => {
-  const { status } = req.body as { status: string };
+  const { status, trackingId, trackingLink } = req.body as {
+    status: string;
+    trackingId?: string;
+    trackingLink?: string;
+  };
   try {
     const orderRef = db.collection('orders').doc(String(req.params.id));
     const orderSnap = await orderRef.get();
@@ -185,7 +213,14 @@ router.patch('/:id', verifyToken, async (req: Request, res: Response) => {
 
     if (!isVendorMatch && !isAdminMatch) {
       res.status(403).json({
-        error: 'Unauthorized. Only the vendor who owns this order can update it.',
+        error: 'Unauthorized. Only the creator who owns this order can update it.',
+      });
+      return;
+    }
+    
+    if (req.user!.role === 'admin' && orderData.vendorId !== 'admin') {
+      res.status(403).json({
+        error: 'Administrators cannot modify orders belonging to specific vendors.',
       });
       return;
     }
@@ -198,15 +233,31 @@ router.patch('/:id', verifyToken, async (req: Request, res: Response) => {
       return;
     }
 
+    if (status === 'Approved') {
+      if (!trackingId || !trackingId.trim() || !trackingLink || !trackingLink.trim()) {
+        res.status(400).json({
+          error: 'Tracking ID and Tracking Link are required to approve/accept the order.',
+        });
+        return;
+      }
+    }
+
     // ── Apply update with timeline entry ─────────────────
     const timestamp = new Date().toISOString();
     const timelineEntry = { status, timestamp };
 
-    await orderRef.update({
+    const updateFields: any = {
       status,
       [`${status.toLowerCase()}At`]: timestamp,
       timeline: admin.firestore.FieldValue.arrayUnion(timelineEntry),
-    });
+    };
+
+    if (status === 'Approved') {
+      updateFields.trackingId = trackingId!.trim();
+      updateFields.trackingLink = trackingLink!.trim();
+    }
+
+    await orderRef.update(updateFields);
 
     if (status === 'Rejected') {
       try {
@@ -218,8 +269,21 @@ router.patch('/:id', verifyToken, async (req: Request, res: Response) => {
             await productRef.update({ stock: currentStock + item.qty });
           }
         }
+
+        // Razorpay Partial Refund
+        if (orderData.paymentMethod === 'Razorpay' && orderData.razorpayPaymentId) {
+          const razorpay = new Razorpay({
+            key_id: process.env.RAZORPAY_KEY_ID,
+            key_secret: process.env.RAZORPAY_KEY_SECRET,
+          });
+          const refundAmountPaise = Math.round((Number(orderData.totalAmount) || 0) * 100);
+          const refundRes = await razorpay.payments.refund(orderData.razorpayPaymentId, {
+            amount: refundAmountPaise,
+          });
+          await orderRef.update({ refundId: refundRes.id });
+        }
       } catch (err) {
-        console.error("Failed to restore stock on rejection:", err);
+        console.error("Failed to restore stock or process refund on rejection:", err);
       }
     }
 
