@@ -70,7 +70,7 @@ router.get('/:id', async (req: Request, res: Response) => {
         return;
       }
     }
-    res.json({ id: snap.id, ...productData });
+    res.json({ ...productData, id: snap.id });
   } catch {
     res.status(500).json({ error: 'Failed to fetch product.' });
   }
