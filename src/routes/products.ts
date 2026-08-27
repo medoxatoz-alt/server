@@ -167,9 +167,41 @@ router.put('/:id', verifyToken, requireVendor, async (req: Request, res: Respons
 // DELETE /api/products/:id  —  Delete product (admin only)
 router.delete('/:id', verifyToken, requireAdmin, async (req: Request, res: Response) => {
   try {
-    await db.collection('products').doc(String(req.params.id)).delete();
+    const productId = String(req.params.id);
+    
+    // 1. Delete the product itself
+    await db.collection('products').doc(productId).delete();
+
+    // 2. Delete the product from all users' carts
+    try {
+      const cartsSnap = await db.collectionGroup('cart').where('productId', '==', productId).get();
+      if (!cartsSnap.empty) {
+        const batch = db.batch();
+        cartsSnap.forEach(doc => batch.delete(doc.ref));
+        await batch.commit();
+      }
+    } catch (err: any) {
+      console.warn('CollectionGroup query failed (index possibly missing). Falling back to iterating users...');
+      // Fallback: iterate all users to delete the cart item manually
+      const usersSnap = await db.collection('users').get();
+      const batch = db.batch();
+      let count = 0;
+      for (const userDoc of usersSnap.docs) {
+        batch.delete(userDoc.ref.collection('cart').doc(productId));
+        count++;
+        // Commit in chunks of 500 (Firestore batch limit)
+        if (count % 500 === 0) {
+          await batch.commit();
+        }
+      }
+      if (count % 500 !== 0) {
+        await batch.commit();
+      }
+    }
+
     res.json({ success: true });
-  } catch {
+  } catch (err: any) {
+    console.error('Delete Product Error:', err);
     res.status(500).json({ error: 'Failed to delete product.' });
   }
 });

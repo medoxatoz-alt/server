@@ -25,7 +25,8 @@ async function resolveRole(uid: string, email: string): Promise<UserSession> {
   const lowerEmail = email.toLowerCase();
 
   if (lowerEmail === ADMIN_EMAIL) {
-    return { uid, email, role: 'admin' };
+    const adminSnap = await db.collection('users').doc(uid).get();
+    return { uid, email, role: 'admin', phone: adminSnap.exists ? adminSnap.data()!.phone : '' };
   }
 
   // Check vendor collection
@@ -36,6 +37,7 @@ async function resolveRole(uid: string, email: string): Promise<UserSession> {
       uid,
       email,
       name: vdata.storeName || vdata.name,
+      phone: vdata.phone || '',
       role: 'vendor',
       status: vdata.status ?? 'pending',
     };
@@ -48,6 +50,7 @@ async function resolveRole(uid: string, email: string): Promise<UserSession> {
     uid,
     email,
     name: udata.name,
+    phone: udata.phone || '',
     role: 'buyer',
   };
 }
@@ -217,7 +220,43 @@ router.post('/verify', async (req: Request, res: Response) => {
   }
 });
 
-// GET /api/auth/me  —  Return current session user
+// POST /api/auth/verify-phone — Verify phone OTP ID Token and link it to current user
+router.post('/verify-phone', verifyToken, async (req: Request, res: Response) => {
+  const { idToken } = req.body as { idToken: string };
+  if (!idToken) {
+    res.status(400).json({ error: 'Firebase ID token is required.' });
+    return;
+  }
+
+  try {
+    const decodedToken = await auth.verifyIdToken(idToken);
+    const phoneNumber = decodedToken.phone_number;
+
+    if (!phoneNumber) {
+      res.status(400).json({ error: 'No phone number found in token.' });
+      return;
+    }
+
+    const uid = req.user!.uid;
+
+    // Update in Firestore based on role
+    if (req.user!.role === 'vendor') {
+      await db.collection('vendors').doc(uid).update({ phone: phoneNumber });
+    } else {
+      await db.collection('users').doc(uid).update({ phone: phoneNumber });
+    }
+
+    // Generate new session token
+    const session = await resolveRole(uid, req.user!.email);
+    const token = jwt.sign(session, JWT_SECRET, { expiresIn: '7d' });
+
+    res.cookie('medox_token', token, COOKIE_OPTS);
+    res.json({ success: true, user: session, phone: phoneNumber });
+  } catch (err: any) {
+    console.error('Verify phone error:', err);
+    res.status(401).json({ error: 'Failed to verify phone token.' });
+  }
+});
 router.get('/me', verifyToken, async (req: Request, res: Response) => {
   try {
     const session = await resolveRole(req.user!.uid, req.user!.email);

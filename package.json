@@ -9,10 +9,13 @@
     "start": "node dist/index.js"
   },
   "dependencies": {
+    "@phonepe-pg/pg-sdk-node": "^2.0.6",
     "@types/express-session": "^1.19.0",
     "@types/passport": "^1.0.17",
     "@types/passport-google-oauth20": "^2.0.17",
     "@types/pdfkit": "^0.17.6",
+    "axios": "^1.20.0",
+    "cashfree-pg": "^6.0.5",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.6.1",

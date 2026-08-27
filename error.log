@@ -1,0 +1,517 @@
+2026-06-27T10:14:54.301Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:41:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-06-27T10:14:54.330Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:41:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-06-27T10:14:58.011Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:41:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-06-27T10:14:58.094Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:41:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-06-27T10:14:59.266Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:41:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-06-27T10:14:59.330Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:41:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-06-27T10:15:01.811Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:41:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-06-27T10:15:01.817Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:41:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-06-27T10:15:03.517Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:41:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-06-27T10:15:03.526Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:41:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-06-27T10:15:12.352Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:41:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-06-27T10:15:12.363Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:41:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-06-27T10:15:13.326Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:41:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-06-27T10:15:13.341Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:41:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-06-27T10:16:13.786Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:41:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-06-27T10:16:13.804Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:41:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-07-13T06:34:33.518Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:42:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-07-13T06:34:33.528Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:42:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-07-13T06:34:33.532Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:42:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-07-13T06:34:54.209Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:42:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-07-13T06:34:54.216Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:42:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-07-13T06:34:54.219Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:42:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-07-13T06:34:55.829Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:42:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-07-13T06:34:55.846Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:42:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-07-13T06:34:55.849Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:42:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-07-13T06:34:56.615Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:42:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-07-13T06:34:56.639Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:42:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-07-13T06:34:56.642Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:42:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-07-13T06:35:11.653Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:42:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-07-13T06:35:11.677Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:42:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-07-13T06:35:11.678Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:42:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-07-13T06:35:12.762Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:42:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-07-13T06:35:12.775Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:42:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-07-13T06:35:12.778Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:42:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-07-13T06:35:26.828Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:42:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-07-13T06:35:26.841Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:42:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-07-13T06:35:26.843Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:42:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-07-13T06:35:43.927Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:42:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-07-13T06:35:43.939Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:42:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-07-13T06:35:43.942Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:42:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-07-13T06:35:44.598Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:42:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-07-13T06:35:44.612Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:42:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-07-13T06:35:44.615Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:42:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-08-27T14:15:55.306Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:42:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-08-27T14:15:55.316Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:42:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-08-27T14:15:55.318Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:42:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-08-27T14:15:55.320Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:42:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at Layer.handle [as handle_request] (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
+    at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)

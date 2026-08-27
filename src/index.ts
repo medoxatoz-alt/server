@@ -19,6 +19,7 @@ import uploadRoutes   from './routes/upload';
 import userRoutes     from './routes/user';
 import reviewsRoutes  from './routes/reviews';
 import paymentRoutes  from './routes/payments';
+import shiprocketRoutes from './routes/shiprocket';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -35,9 +36,10 @@ app.use(helmet());
 app.use(cors({
   origin: (origin, callback) => {
     // allow requests with no origin (like mobile apps or curl requests)
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin || allowedOrigins.includes(origin) || origin.startsWith('http://localhost:3000')) {
       callback(null, true);
     } else {
+      console.error(`[Server Error] Not allowed by CORS. Origin: "${origin}". Allowed:`, allowedOrigins);
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -46,7 +48,14 @@ app.use(cors({
 }));
 
 // ─── Body Parsers ────────────────────────────────────────────────────────────
-app.use(express.json({ limit: '2mb' }));
+// The verify callback stashes the raw body string on req so Cashfree webhook
+// signature verification can use it (HMAC is computed over the raw payload).
+app.use(express.json({
+  limit: '2mb',
+  verify: (req: any, _res, buf) => {
+    req.rawBody = buf.toString();
+  },
+}));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
@@ -69,16 +78,17 @@ const generalLimiter = rateLimit({
 app.use(generalLimiter);
 
 // ─── Routes ──────────────────────────────────────────────────────────────────
-app.use('/api/auth',     authLimiter, authRoutes);
-app.use('/api/products', productRoutes);
-app.use('/api/cart',     cartRoutes);
-app.use('/api/orders',   orderRoutes);
-app.use('/api/vendors',  vendorRoutes);
-app.use('/api/admin',    adminRoutes);
-app.use('/api/upload',   uploadRoutes);
-app.use('/api/user',     userRoutes);
-app.use('/api/reviews',  reviewsRoutes);
-app.use('/api/payments', paymentRoutes);
+app.use('/api/auth',        authLimiter, authRoutes);
+app.use('/api/products',    productRoutes);
+app.use('/api/cart',        cartRoutes);
+app.use('/api/orders',      orderRoutes);
+app.use('/api/vendors',     vendorRoutes);
+app.use('/api/admin',       adminRoutes);
+app.use('/api/upload',      uploadRoutes);
+app.use('/api/user',        userRoutes);
+app.use('/api/reviews',     reviewsRoutes);
+app.use('/api/payments',    paymentRoutes);
+app.use('/api/shiprocket',  shiprocketRoutes);
 
 // ─── Health Check ────────────────────────────────────────────────────────────
 app.get('/api/health', (_req, res) => {

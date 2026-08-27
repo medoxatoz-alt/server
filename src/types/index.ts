@@ -3,6 +3,7 @@
 export interface UserSession {
   uid: string;
   email: string;
+  phone?: string;
   name?: string;
   role: 'buyer' | 'vendor' | 'admin';
   status?: 'pending' | 'approved' | 'rejected';
@@ -62,8 +63,18 @@ export interface Order {
   confirmedOrderId?: string;
   createdAt: string;
   timeline?: Array<{ status: string; timestamp: string }>;
+  // Cashfree
+  cashfreeOrderId?: string;
+  cashfreePaymentId?: string;
+  // Shiprocket
+  shiprocketOrderId?: number;
+  shiprocketShipmentId?: number;
+  awbCode?: string;
+  courierName?: string;
   trackingId?: string;
   trackingLink?: string;
+  // Invoice
+  invoiceUrl?: string;
 }
 
 export interface VendorProfile {

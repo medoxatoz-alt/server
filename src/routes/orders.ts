@@ -6,9 +6,9 @@ import { db } from '../firebase';
 import { verifyToken } from '../middleware/verifyToken';
 import { requireAdmin } from '../middleware/requireAdmin';
 import { Order, OrderItem } from '../types';
+import { createShiprocketShipment, cancelShiprocketOrder } from '../utils/shiprocket';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const Razorpay = require('razorpay');
+
 
 const router = Router();
 
@@ -192,8 +192,8 @@ router.post('/', verifyToken, async (req: Request, res: Response) => {
 router.patch('/:id', verifyToken, async (req: Request, res: Response) => {
   const { status, trackingId, trackingLink } = req.body as {
     status: string;
-    trackingId?: string;
-    trackingLink?: string;
+    trackingId?: string;  // optional — Shiprocket auto-fills this
+    trackingLink?: string; // optional — Shiprocket auto-fills this
   };
   try {
     const orderRef = db.collection('orders').doc(String(req.params.id));
@@ -233,14 +233,7 @@ router.patch('/:id', verifyToken, async (req: Request, res: Response) => {
       return;
     }
 
-    if (status === 'Approved') {
-      if (!trackingId || !trackingId.trim() || !trackingLink || !trackingLink.trim()) {
-        res.status(400).json({
-          error: 'Tracking ID and Tracking Link are required to approve/accept the order.',
-        });
-        return;
-      }
-    }
+    // trackingId/trackingLink are now optional — Shiprocket fills them automatically on approval
 
     // ── Apply update with timeline entry ─────────────────
     const timestamp = new Date().toISOString();
@@ -252,15 +245,39 @@ router.patch('/:id', verifyToken, async (req: Request, res: Response) => {
       timeline: admin.firestore.FieldValue.arrayUnion(timelineEntry),
     };
 
-    if (status === 'Approved') {
-      updateFields.trackingId = trackingId!.trim();
-      updateFields.trackingLink = trackingLink!.trim();
-    }
+    // Preserve any manually supplied tracking fields (fallback)
+    if (status === 'Approved' && trackingId?.trim()) updateFields.trackingId = trackingId.trim();
+    if (status === 'Approved' && trackingLink?.trim()) updateFields.trackingLink = trackingLink.trim();
 
     await orderRef.update(updateFields);
 
+    // ── Post-update side-effects ──────────────────────────────────────────────
+    if (status === 'Approved') {
+      // Auto-create Shiprocket shipment and save AWB tracking info
+      setImmediate(async () => {
+        try {
+          const fullOrderSnap = await orderRef.get();
+          const fullOrder = fullOrderSnap.data() as Order;
+          const sr = await createShiprocketShipment(fullOrder);
+          await orderRef.update({
+            shiprocketOrderId: sr.shiprocketOrderId,
+            shiprocketShipmentId: sr.shiprocketShipmentId,
+            awbCode: sr.awbCode,
+            courierName: sr.courierName,
+            trackingId: sr.awbCode || fullOrder.trackingId,
+            trackingLink: sr.trackingLink || fullOrder.trackingLink,
+          });
+          console.log(`[Shiprocket] Shipment created for order ${orderData.orderId}: AWB=${sr.awbCode}`);
+        } catch (srErr: any) {
+          console.error('[Shiprocket] Failed to create shipment:', srErr.message);
+          // Non-fatal — order is still approved
+        }
+      });
+    }
+
     if (status === 'Rejected') {
       try {
+        // Restore stock
         for (const item of orderData.items) {
           const productRef = db.collection('products').doc(String(item.productId));
           const productSnap = await productRef.get();
@@ -269,21 +286,12 @@ router.patch('/:id', verifyToken, async (req: Request, res: Response) => {
             await productRef.update({ stock: currentStock + item.qty });
           }
         }
-
-        // Razorpay Partial Refund
-        if (orderData.paymentMethod === 'Razorpay' && orderData.razorpayPaymentId) {
-          const razorpay = new Razorpay({
-            key_id: process.env.RAZORPAY_KEY_ID,
-            key_secret: process.env.RAZORPAY_KEY_SECRET,
-          });
-          const refundAmountPaise = Math.round((Number(orderData.totalAmount) || 0) * 100);
-          const refundRes = await razorpay.payments.refund(orderData.razorpayPaymentId, {
-            amount: refundAmountPaise,
-          });
-          await orderRef.update({ refundId: refundRes.id });
+        // Cancel Shiprocket shipment if one was created
+        if (orderData.shiprocketOrderId) {
+          await cancelShiprocketOrder(orderData.shiprocketOrderId);
         }
       } catch (err) {
-        console.error("Failed to restore stock or process refund on rejection:", err);
+        console.error('Failed to restore stock or cancel shipment on rejection:', err);
       }
     }
 
