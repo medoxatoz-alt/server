@@ -96,6 +96,7 @@ async function createOrdersInFirestore(
   paymentFields: Record<string, any>,
   userUid: string,
   userEmail: string,
+  paymentIntentId?: string,
 ): Promise<string[]> {
   const createdOrderIds: string[] = [];
   const timestamp = new Date().toISOString();
@@ -112,6 +113,15 @@ async function createOrdersInFirestore(
     }
 
     // All reads first
+    let intentRef: admin.firestore.DocumentReference | undefined;
+    if (paymentIntentId) {
+      intentRef = db.collection('paymentIntents').doc(paymentIntentId);
+      const intentSnap = await transaction.get(intentRef);
+      if (intentSnap.exists && intentSnap.data()?.status === 'paid') {
+        throw new Error('ALREADY_PROCESSED');
+      }
+    }
+
     const productRefs = new Map<string, admin.firestore.DocumentReference>();
     const newStocks = new Map<string, number>();
 
@@ -153,6 +163,15 @@ async function createOrdersInFirestore(
     }
     for (const [pId, stock] of newStocks) {
       transaction.update(productRefs.get(pId)!, { stock });
+    }
+    
+    if (intentRef) {
+      transaction.update(intentRef, {
+        status: 'paid',
+        cashfreePaymentId: paymentFields.cashfreePaymentId || '',
+        orderIds: createdOrderIds,
+        paidAt: timestamp,
+      });
     }
   });
 
@@ -327,21 +346,23 @@ router.post('/cashfree/webhook', async (req: Request, res: Response) => {
       return;
     }
 
-    const orderIds = await createOrdersInFirestore(
-      intent as any,
-      'Cashfree',
-      { cashfreeOrderId: cfOrderId, cashfreePaymentId: cfPaymentId },
-      intent.customerId,
-      intent.customerEmail,
-    );
-
-    // Mark intent as paid
-    await db.collection('paymentIntents').doc(cfOrderId).update({
-      status: 'paid',
-      cashfreePaymentId: cfPaymentId,
-      orderIds,
-      paidAt: new Date().toISOString(),
-    });
+    let orderIds: string[] = [];
+    try {
+      orderIds = await createOrdersInFirestore(
+        intent as any,
+        'Cashfree',
+        { cashfreeOrderId: cfOrderId, cashfreePaymentId: cfPaymentId },
+        intent.customerId,
+        intent.customerEmail,
+        cfOrderId
+      );
+    } catch (err: any) {
+      if (err.message === 'ALREADY_PROCESSED') {
+        res.status(200).json({ received: true, message: 'Already processed by another instance' });
+        return;
+      }
+      throw err;
+    }
 
     // Generate invoices (non-blocking for webhook response)
     generateInvoices(orderIds).then(async (urls) => {
@@ -412,20 +433,23 @@ router.post('/cashfree/verify', verifyToken, async (req: Request, res: Response)
       // Create orders now (webhook was late or missed)
       const cfPaymentId = cfResponse.data?.cf_order_id?.toString() || cashfree_order_id;
 
-      const orderIds = await createOrdersInFirestore(
-        intent as any,
-        'Cashfree',
-        { cashfreeOrderId: cashfree_order_id, cashfreePaymentId: cfPaymentId },
-        intent.customerId,
-        intent.customerEmail,
-      );
-
-      await db.collection('paymentIntents').doc(cashfree_order_id).update({
-        status: 'paid',
-        cashfreePaymentId: cfPaymentId,
-        orderIds,
-        paidAt: new Date().toISOString(),
-      });
+      let orderIds: string[] = [];
+      try {
+        orderIds = await createOrdersInFirestore(
+          intent as any,
+          'Cashfree',
+          { cashfreeOrderId: cashfree_order_id, cashfreePaymentId: cfPaymentId },
+          intent.customerId,
+          intent.customerEmail,
+          cashfree_order_id
+        );
+      } catch (err: any) {
+        if (err.message === 'ALREADY_PROCESSED') {
+          const freshIntent = (await db.collection('paymentIntents').doc(cashfree_order_id).get()).data()!;
+          return res.status(200).json({ success: true, orderIds: freshIntent.orderIds || [], invoiceUrls: freshIntent.invoiceUrls || [] }) as any;
+        }
+        throw err;
+      }
 
       const invoiceUrls = await generateInvoices(orderIds);
 
