@@ -13,8 +13,9 @@ export const MAIN_CATEGORIES = [
   
   { id: 'medical-products', name: 'All HOSP DEPT WISE PRODUCTS' },
   { id: 'surgical-products', name: 'Surgical Products' },
-  { id: 'health-wellness', name: 'Health & Wellness Products' },
+
   { id: 'diagnostic-products', name: 'Diagnostic Products' },
+    { id: 'health-wellness', name: 'Health & Wellness Products' },
   { id: 'home-lifestyle', name: 'Home & Lifestyle' },
   { id: 'puja-items', name: 'Healing Puja Products' }
 ];
