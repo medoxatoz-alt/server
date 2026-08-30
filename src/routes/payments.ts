@@ -44,6 +44,7 @@ async function resolveCart(cartItems: Array<{ productId: string; quantity: numbe
   const resolvedItems: Array<{
     productId: string; title: string; price: number; qty: number;
     subtotal: number; image: string; vendorId: string; currentStock: number;
+    weight?: number; length?: number; breadth?: number; height?: number;
   }> = [];
 
   for (const cartItem of finalCart) {
