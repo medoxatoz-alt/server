@@ -17,9 +17,9 @@ import vendorRoutes   from './routes/vendors';
 import adminRoutes    from './routes/admin';
 import uploadRoutes   from './routes/upload';
 import userRoutes     from './routes/user';
-import reviewsRoutes  from './routes/reviews';
 import paymentRoutes  from './routes/payments';
 import shiprocketRoutes from './routes/shiprocket';
+import categoriesRoutes from './routes/categories';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -86,9 +86,9 @@ app.use('/api/vendors',     vendorRoutes);
 app.use('/api/admin',       adminRoutes);
 app.use('/api/upload',      uploadRoutes);
 app.use('/api/user',        userRoutes);
-app.use('/api/reviews',     reviewsRoutes);
 app.use('/api/payments',    paymentRoutes);
-app.use('/api/shiprocket',  shiprocketRoutes);
+app.use('/api/shipment',    shiprocketRoutes);
+app.use('/api/categories',  categoriesRoutes);
 
 // ─── Health Check ────────────────────────────────────────────────────────────
 app.get('/api/health', (_req, res) => {

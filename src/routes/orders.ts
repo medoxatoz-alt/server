@@ -172,6 +172,32 @@ router.post('/', verifyToken, async (req: Request, res: Response) => {
     });
 
     res.status(201).json({ success: true, orderIds: createdOrderIds });
+
+    // ── Auto-push to Shiprocket for COD ───────────────────────────────────────
+    if (paymentMethod === 'Cash on Delivery (COD)' || paymentMethod === 'COD') {
+      setImmediate(async () => {
+        for (const id of createdOrderIds) {
+          try {
+            const snap = await db.collection('orders').doc(id).get();
+            if (!snap.exists) continue;
+            const fullOrder = snap.data() as Order;
+            const sr = await createShiprocketShipment(fullOrder);
+            await db.collection('orders').doc(id).update({
+              shiprocketOrderId: sr.shiprocketOrderId,
+              shiprocketShipmentId: sr.shiprocketShipmentId,
+              awbCode: sr.awbCode,
+              courierName: sr.courierName,
+              trackingId: sr.awbCode,
+              trackingLink: sr.trackingLink,
+            });
+            console.log(`[Shiprocket] Shipment created for COD order ${fullOrder.orderId}: AWB=${sr.awbCode}`);
+          } catch (err: any) {
+            console.error('[Shiprocket] Failed to create shipment for order', id, ':', err.message);
+          }
+        }
+      });
+    }
+
   } catch (error: any) {
     console.error('Error placing order:', error);
     if (error.message === 'PRODUCT_NOT_FOUND') {

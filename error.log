@@ -515,3 +515,223 @@
     at Function.process_params (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:346:12)
     at next (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\express\lib\router\index.js:280:10)
     at internalNext (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\helmet\index.cjs:531:6)
+2026-08-30T08:03:29.096Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:44:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\core\src\integrations\express\patch-layer.ts:214:36
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:136:38
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:95:15
+    at Module.handleCallbackErrors (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\core\src\utils\handleCallbackErrors.ts:52:26)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:94:14
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\tracer.ts:100:14
+2026-08-30T08:03:29.170Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:44:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\core\src\integrations\express\patch-layer.ts:214:36
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:136:38
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:95:15
+    at Module.handleCallbackErrors (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\core\src\utils\handleCallbackErrors.ts:52:26)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:94:14
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\tracer.ts:100:14
+2026-08-30T08:03:29.174Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:44:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\core\src\integrations\express\patch-layer.ts:214:36
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:136:38
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:95:15
+    at Module.handleCallbackErrors (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\core\src\utils\handleCallbackErrors.ts:52:26)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:94:14
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\tracer.ts:100:14
+2026-08-30T08:03:29.180Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:44:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\core\src\integrations\express\patch-layer.ts:214:36
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:136:38
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:95:15
+    at Module.handleCallbackErrors (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\core\src\utils\handleCallbackErrors.ts:52:26)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:94:14
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\tracer.ts:100:14
+2026-08-30T08:03:49.711Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:44:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\core\src\integrations\express\patch-layer.ts:214:36
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:136:38
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:95:15
+    at Module.handleCallbackErrors (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\core\src\utils\handleCallbackErrors.ts:52:26)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:94:14
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\tracer.ts:100:14
+2026-08-30T08:03:49.721Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:44:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\core\src\integrations\express\patch-layer.ts:214:36
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:136:38
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:95:15
+    at Module.handleCallbackErrors (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\core\src\utils\handleCallbackErrors.ts:52:26)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:94:14
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\tracer.ts:100:14
+2026-08-30T08:03:49.728Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:44:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\core\src\integrations\express\patch-layer.ts:214:36
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:136:38
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:95:15
+    at Module.handleCallbackErrors (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\core\src\utils\handleCallbackErrors.ts:52:26)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:94:14
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\tracer.ts:100:14
+2026-08-30T08:03:49.731Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:44:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\core\src\integrations\express\patch-layer.ts:214:36
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:136:38
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:95:15
+    at Module.handleCallbackErrors (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\core\src\utils\handleCallbackErrors.ts:52:26)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:94:14
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\tracer.ts:100:14
+2026-08-30T08:03:51.727Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:44:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\core\src\integrations\express\patch-layer.ts:214:36
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:136:38
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:95:15
+    at Module.handleCallbackErrors (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\core\src\utils\handleCallbackErrors.ts:52:26)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:94:14
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\tracer.ts:100:14
+2026-08-30T08:03:51.734Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:44:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\core\src\integrations\express\patch-layer.ts:214:36
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:136:38
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:95:15
+    at Module.handleCallbackErrors (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\core\src\utils\handleCallbackErrors.ts:52:26)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:94:14
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\tracer.ts:100:14
+2026-08-30T08:03:51.738Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:44:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\core\src\integrations\express\patch-layer.ts:214:36
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:136:38
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:95:15
+    at Module.handleCallbackErrors (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\core\src\utils\handleCallbackErrors.ts:52:26)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:94:14
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\tracer.ts:100:14
+2026-08-30T08:03:51.742Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:44:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\core\src\integrations\express\patch-layer.ts:214:36
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:136:38
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:95:15
+    at Module.handleCallbackErrors (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\core\src\utils\handleCallbackErrors.ts:52:26)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:94:14
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\tracer.ts:100:14
+2026-08-30T08:03:52.399Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:44:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\core\src\integrations\express\patch-layer.ts:214:36
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:136:38
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:95:15
+    at Module.handleCallbackErrors (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\core\src\utils\handleCallbackErrors.ts:52:26)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:94:14
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\tracer.ts:100:14
+2026-08-30T08:03:52.406Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:44:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\core\src\integrations\express\patch-layer.ts:214:36
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:136:38
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:95:15
+    at Module.handleCallbackErrors (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\core\src\utils\handleCallbackErrors.ts:52:26)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:94:14
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\tracer.ts:100:14
+2026-08-30T08:03:52.410Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:44:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\core\src\integrations\express\patch-layer.ts:214:36
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:136:38
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:95:15
+    at Module.handleCallbackErrors (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\core\src\utils\handleCallbackErrors.ts:52:26)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:94:14
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\tracer.ts:100:14
+2026-08-30T08:03:52.414Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:44:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\core\src\integrations\express\patch-layer.ts:214:36
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:136:38
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:95:15
+    at Module.handleCallbackErrors (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\core\src\utils\handleCallbackErrors.ts:52:26)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:94:14
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\tracer.ts:100:14
+2026-08-30T08:03:58.994Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:44:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\core\src\integrations\express\patch-layer.ts:214:36
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:136:38
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:95:15
+    at Module.handleCallbackErrors (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\core\src\utils\handleCallbackErrors.ts:52:26)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:94:14
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\tracer.ts:100:14
+2026-08-30T08:03:58.998Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:44:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\core\src\integrations\express\patch-layer.ts:214:36
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:136:38
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:95:15
+    at Module.handleCallbackErrors (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\core\src\utils\handleCallbackErrors.ts:52:26)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:94:14
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\tracer.ts:100:14
+2026-08-30T08:03:59.002Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:44:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\core\src\integrations\express\patch-layer.ts:214:36
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:136:38
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:95:15
+    at Module.handleCallbackErrors (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\core\src\utils\handleCallbackErrors.ts:52:26)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:94:14
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\tracer.ts:100:14
+2026-08-30T08:03:59.007Z Error: Not allowed by CORS
+    at origin (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\src\index.ts:44:16)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:199:9)
+    at corsMiddleware (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\cors\lib\index.js:204:7)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\core\src\integrations\express\patch-layer.ts:214:36
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:136:38
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:95:15
+    at Module.handleCallbackErrors (C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\core\src\utils\handleCallbackErrors.ts:52:26)
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\trace.ts:94:14
+    at C:\Users\Chaitanya sai\Desktop\medox\medoxatoz\server-main\node_modules\@sentry\opentelemetry\src\tracer.ts:100:14

@@ -12,7 +12,9 @@ export interface UserSession {
 export interface Product {
   id: string;
   title: string;
-  category: string;
+  mainCategoryId: string;
+  subCategoryId?: string;
+  brand?: string;
   price: number;
   mrp?: number;
   stock: number;

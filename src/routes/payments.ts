@@ -1,4 +1,4 @@
-// src/routes/payments.ts — Cashfree Payment Gateway + COD
+// src/routes/payments.ts — Cashfree Payment Gateway
 
 import { Router, Request, Response } from 'express';
 import crypto from 'crypto';
@@ -8,6 +8,7 @@ import { db, storage } from '../firebase';
 import { verifyToken } from '../middleware/verifyToken';
 import { Order, OrderItem } from '../types';
 import { generateInvoicePdf } from '../utils/pdfGenerator';
+import { createShiprocketShipment } from '../utils/shiprocket';
 
 const router = Router();
 
@@ -324,6 +325,29 @@ router.post('/cashfree/webhook', async (req: Request, res: Response) => {
       }
     }).catch(() => {});
 
+    // Auto-push to Shiprocket
+    setImmediate(async () => {
+      for (const id of orderIds) {
+        try {
+          const snap = await db.collection('orders').doc(id).get();
+          if (!snap.exists) continue;
+          const fullOrder = snap.data() as Order;
+          const sr = await createShiprocketShipment(fullOrder);
+          await db.collection('orders').doc(id).update({
+            shiprocketOrderId: sr.shiprocketOrderId,
+            shiprocketShipmentId: sr.shiprocketShipmentId,
+            awbCode: sr.awbCode,
+            courierName: sr.courierName,
+            trackingId: sr.awbCode,
+            trackingLink: sr.trackingLink,
+          });
+          console.log(`[Shiprocket] Shipment created for Cashfree order ${fullOrder.orderId}: AWB=${sr.awbCode}`);
+        } catch (err: any) {
+          console.error('[Shiprocket] Failed to create shipment for order', id, ':', err.message);
+        }
+      }
+    });
+
     res.status(200).json({ received: true });
   } catch (err: any) {
     console.error('[Cashfree Webhook] Error processing payment:', err.message);
@@ -394,8 +418,6 @@ router.post('/cashfree/verify', verifyToken, async (req: Request, res: Response)
   }
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-// POST /api/payments/place-order  — Cash on Delivery
 // ─────────────────────────────────────────────────────────────────────────────
 router.post('/place-order', verifyToken, async (req: Request, res: Response) => {
   const { cartItems, shippingDetails } = req.body;
