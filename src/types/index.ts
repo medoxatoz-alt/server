@@ -60,7 +60,7 @@ export interface Order {
   shippingDetails: ShippingDetails;
   items: OrderItem[];
   totalAmount: number;
-  status: 'Pending' | 'Approved' | 'Rejected' | 'Delivered';
+  status: 'Approved' | 'Rejected' | 'Delivered';
   paymentMethod: string;
   confirmedOrderId?: string;
   createdAt: string;

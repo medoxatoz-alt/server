@@ -127,10 +127,10 @@ async function createOrdersInFirestore(
         shippingDetails: intent.shippingDetails,
         items: orderItems,
         totalAmount: vendorTotal,
-        status: 'Pending',
+        status: 'Approved',
         paymentMethod,
         createdAt: timestamp,
-        timeline: [{ status: 'Pending', timestamp }],
+        timeline: [{ status: 'Approved', timestamp }],
         ...paymentFields,
       } as any;
       transaction.set(newOrderRef, orderData);
@@ -183,10 +183,15 @@ router.post('/cashfree/create-order', verifyToken, async (req: Request, res: Res
   try {
     const { totalAmount, resolvedItems } = await resolveCart(cartItems);
 
-    // Create Cashfree order
+    if (totalAmount < 1) {
+      res.status(400).json({ error: 'Order amount must be at least ₹1 to process online payment.' });
+      return;
+    }
+
     const cfOrderId = `CF_${req.user!.uid}_${Date.now()}`;
-    const clientOrigin = req.headers.origin ||  "https://medoxatoz.com";
-    const returnUrl = `${clientOrigin}/checkout/status?cashfree_order_id=${cfOrderId}`;
+    const frontendUrl = process.env.FRONTEND_URL || req.headers.origin || "https://medoxatoz.com";
+    const backendUrl = process.env.BACKEND_URL || "https://api.medoxatoz.com";
+    const returnUrl = `${frontendUrl}/checkout/status?cashfree_order_id=${cfOrderId}`;
 
     const cfRequest = {
       order_id: cfOrderId,
@@ -200,7 +205,7 @@ router.post('/cashfree/create-order', verifyToken, async (req: Request, res: Res
       },
       order_meta: {
         return_url: returnUrl,
-        notify_url: `${process.env.ALLOWED_ORIGIN?.split(',')[0].replace('localhost:3004', 'localhost:5000').replace('localhost:3000', 'localhost:5000')}/api/payments/cashfree/webhook`,
+        notify_url: `${backendUrl}/api/payments/cashfree/webhook`,
       },
     };
 

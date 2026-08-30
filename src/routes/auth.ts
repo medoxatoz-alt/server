@@ -241,9 +241,9 @@ router.post('/verify-phone', verifyToken, async (req: Request, res: Response) =>
 
     // Update in Firestore based on role
     if (req.user!.role === 'vendor') {
-      await db.collection('vendors').doc(uid).update({ phone: phoneNumber });
+      await db.collection('vendors').doc(uid).set({ phone: phoneNumber }, { merge: true });
     } else {
-      await db.collection('users').doc(uid).update({ phone: phoneNumber });
+      await db.collection('users').doc(uid).set({ phone: phoneNumber }, { merge: true });
     }
 
     // Generate new session token

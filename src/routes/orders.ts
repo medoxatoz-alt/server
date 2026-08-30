@@ -16,8 +16,7 @@ const router = Router();
 // STATUS TRANSITION VALIDATOR
 // ─────────────────────────────────────────────────────────
 const VALID_TRANSITIONS: Record<string, string[]> = {
-  Pending: ['Approved', 'Rejected'],
-  Approved: ['Delivered'],
+  Approved: ['Rejected', 'Delivered'],
   Rejected: [],     // Terminal state
   Delivered: [],    // Terminal state
 };
@@ -157,10 +156,10 @@ router.post('/', verifyToken, async (req: Request, res: Response) => {
           shippingDetails,
           items: [item],
           totalAmount: price * qty,
-          status: 'Pending',
+          status: 'Approved',
           paymentMethod: paymentMethod || 'Cash on Delivery (COD)',
           createdAt: timestamp,
-          timeline: [{ status: 'Pending', timestamp }],
+          timeline: [{ status: 'Approved', timestamp }],
         };
 
         transaction.set(newOrderRef, orderData);
@@ -336,7 +335,7 @@ router.delete('/:id', verifyToken, requireAdmin, async (req: Request, res: Respo
     const orderSnap = await orderRef.get();
     if (orderSnap.exists) {
       const orderData = orderSnap.data()!;
-      if (orderData.status === 'Pending' || orderData.status === 'Approved') {
+      if (orderData.status === 'Approved') {
         try {
           for (const item of orderData.items) {
             const productRef = db.collection('products').doc(String(item.productId));
