@@ -184,7 +184,8 @@ router.post('/cashfree/create-order', verifyToken, async (req: Request, res: Res
 
     // Create Cashfree order
     const cfOrderId = `CF_${req.user!.uid}_${Date.now()}`;
-    const returnUrl = `${process.env.ALLOWED_ORIGIN?.split(',')[0]}/checkout/status?cashfree_order_id=${cfOrderId}`;
+    const clientOrigin = req.headers.origin ||  "https://medoxatoz.com";
+    const returnUrl = `${clientOrigin}/checkout/status?cashfree_order_id=${cfOrderId}`;
 
     const cfRequest = {
       order_id: cfOrderId,
