@@ -180,6 +180,12 @@ router.post('/cashfree/create-order', verifyToken, async (req: Request, res: Res
     return;
   }
 
+  const pincodeDigits = shippingDetails?.pincode?.replace(/\s/g, '') || '';
+  if (!/^\d{6}$/.test(pincodeDigits)) {
+    res.status(400).json({ error: 'Please provide a valid 6-digit Pincode.' });
+    return;
+  }
+
   try {
     const { totalAmount, resolvedItems } = await resolveCart(cartItems);
 
@@ -349,6 +355,9 @@ router.post('/cashfree/webhook', async (req: Request, res: Response) => {
           console.log(`[Shiprocket] Shipment created for Cashfree order ${fullOrder.orderId}: AWB=${sr.awbCode}`);
         } catch (err: any) {
           console.error('[Shiprocket] Failed to create shipment for order', id, ':', err.message);
+          if (err.response) {
+            console.error('[Shiprocket] Response Data:', JSON.stringify(err.response.data, null, 2));
+          }
         }
       }
     });
