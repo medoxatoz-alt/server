@@ -190,7 +190,7 @@ router.post('/cashfree/create-order', verifyToken, async (req: Request, res: Res
 
     const cfOrderId = `CF_${req.user!.uid}_${Date.now()}`;
     const frontendUrl = process.env.FRONTEND_URL || req.headers.origin || "https://medoxatoz.com";
-    const backendUrl = process.env.BACKEND_URL || "https://api.medoxatoz.com";
+    const backendUrl = process.env.BACKEND_URL || "https://server-production-e4da.up.railway.app";
     const returnUrl = `${frontendUrl}/checkout/status?cashfree_order_id=${cfOrderId}`;
 
     const cfRequest = {

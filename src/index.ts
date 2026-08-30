@@ -23,8 +23,8 @@ import categoriesRoutes from './routes/categories';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || 'http://localhost:3000';
-const allowedOrigins = ALLOWED_ORIGIN.split(',').map(o => o.trim());
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+const allowedOrigins = FRONTEND_URL.split(',').map(o => o.trim());
 
 // Trust proxy is required for Railway/Heroku to allow secure cookies behind their load balancers
 app.set('trust proxy', 1);

@@ -192,6 +192,9 @@ router.post('/', verifyToken, async (req: Request, res: Response) => {
             console.log(`[Shiprocket] Shipment created for COD order ${fullOrder.orderId}: AWB=${sr.awbCode}`);
           } catch (err: any) {
             console.error('[Shiprocket] Failed to create shipment for order', id, ':', err.message);
+            if (err.response) {
+              console.error('[Shiprocket] Response Data:', JSON.stringify(err.response.data, null, 2));
+            }
           }
         }
       });
