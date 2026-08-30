@@ -3,6 +3,24 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
+// ─── Required env vars ───────────────────────────────────────────────────────
+// Fail fast and loud at startup rather than silently falling back to an
+// insecure default (e.g. a hardcoded JWT secret) at request time.
+const REQUIRED_ENV_VARS = [
+  'JWT_SECRET',
+  'ADMIN_EMAIL',
+  'FIREBASE_ADMIN_PROJECT_ID',
+  'FIREBASE_ADMIN_CLIENT_EMAIL',
+  'FIREBASE_ADMIN_PRIVATE_KEY',
+  'CASHFREE_APP_ID',
+  'CASHFREE_SECRET_KEY',
+];
+const missingEnvVars = REQUIRED_ENV_VARS.filter(name => !process.env[name]);
+if (missingEnvVars.length > 0) {
+  console.error(`FATAL: Missing required environment variables: ${missingEnvVars.join(', ')}`);
+  process.exit(1);
+}
+
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -102,7 +120,7 @@ app.use((_req, res) => {
 
 // ─── Global Error Handler ────────────────────────────────────────────────────
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
-  require('fs').appendFileSync('error.log', new Date().toISOString() + ' ' + err.stack + '\n');
+  require('fs').appendFile('error.log', new Date().toISOString() + ' ' + err.stack + '\n', () => {});
   console.error('[Server Error]', err.message);
   res.status(500).json({ error: 'Internal server error.' });
 });

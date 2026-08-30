@@ -10,12 +10,13 @@ export const MAIN_CATEGORIES = [
   { id: 'skin-hair-care', name: 'Skin & Hair Care' },
   { id: 'dermatology-equipment', name: 'Dermatology Equipment' },
   { id: 'makeup-beauty', name: 'Makeup & Beauty Products' },
-  { id: 'health-wellness', name: 'Health & Wellness Products' },
-  { id: 'medical-products', name: 'Medical Products' },
+  
+  { id: 'medical-products', name: 'All HOSP DEPT WISE PRODUCTS' },
   { id: 'surgical-products', name: 'Surgical Products' },
+  { id: 'health-wellness', name: 'Health & Wellness Products' },
   { id: 'diagnostic-products', name: 'Diagnostic Products' },
   { id: 'home-lifestyle', name: 'Home & Lifestyle' },
-  { id: 'puja-items', name: 'Puja Items' }
+  { id: 'puja-items', name: 'Healing Puja Products' }
 ];
 
 const subcategoriesRef = db.collection('subcategories');
@@ -40,8 +41,19 @@ router.get('/', async (_req: Request, res: Response) => {
     snap.forEach(doc => {
       const data = doc.data();
       subcategoryDocs.push({ id: doc.id, ...data });
-      if (data.mainCategoryId && subcategories[data.mainCategoryId] !== undefined) {
-        subcategories[data.mainCategoryId].push({ id: doc.id, name: data.name });
+    });
+
+    // Sort by order (default to 0) then by name
+    subcategoryDocs.sort((a, b) => {
+      const orderA = a.order || 0;
+      const orderB = b.order || 0;
+      if (orderA !== orderB) return orderA - orderB;
+      return (a.name || '').localeCompare(b.name || '');
+    });
+
+    subcategoryDocs.forEach(doc => {
+      if (doc.mainCategoryId && subcategories[doc.mainCategoryId] !== undefined) {
+        subcategories[doc.mainCategoryId].push({ id: doc.id, name: doc.name });
       }
     });
 
@@ -77,10 +89,11 @@ router.post('/sub', verifyToken, requireAdmin, async (req: Request, res: Respons
     const docRef = await subcategoriesRef.add({
       mainCategoryId,
       name: name.trim(),
+      order: Date.now(), // default order so it appears at the end
       createdAt: new Date().toISOString()
     });
     
-    res.status(201).json({ success: true, id: docRef.id, mainCategoryId, name: name.trim() });
+    res.status(201).json({ success: true, id: docRef.id, mainCategoryId, name: name.trim(), order: Date.now() });
   } catch (error) {
     console.error('Failed to create subcategory:', error);
     res.status(500).json({ error: 'Failed to create subcategory' });
@@ -95,12 +108,27 @@ router.delete('/sub/:id', verifyToken, requireAdmin, async (req: Request, res: R
   try {
     const id = req.params.id as string;
     
+    const subDoc = await subcategoriesRef.doc(id).get();
+    if (!subDoc.exists) {
+      res.status(404).json({ error: 'Subcategory not found' });
+      return;
+    }
+    const subName = subDoc.data()?.name;
+
     const { db } = require('../firebase');
     const productsRef = db.collection('products');
+    
+    // Check by ID
     const productsSnap = await productsRef.where('subCategoryId', '==', id).limit(1).get();
-    const productsSnapOld = await productsRef.where('subCategory', '==', id).limit(1).get();
+    
+    // Check by Name (legacy)
+    let productsSnapOldEmpty = true;
+    if (subName) {
+      const snap = await productsRef.where('subCategory', '==', subName).limit(1).get();
+      productsSnapOldEmpty = snap.empty;
+    }
 
-    if (!productsSnap.empty || !productsSnapOld.empty) {
+    if (!productsSnap.empty || !productsSnapOldEmpty) {
       res.status(400).json({ error: 'Cannot delete subcategory because it has associated products. Please reassign or delete those products first.' });
       return;
     }
@@ -110,6 +138,34 @@ router.delete('/sub/:id', verifyToken, requireAdmin, async (req: Request, res: R
   } catch (error) {
     console.error('Failed to delete subcategory:', error);
     res.status(500).json({ error: 'Failed to delete subcategory' });
+  }
+});
+
+// ─────────────────────────────────────────────────────────
+// PUT /api/categories/sub/reorder
+// Admin reorders subcategories
+// ─────────────────────────────────────────────────────────
+router.put('/sub/reorder', verifyToken, requireAdmin, async (req: Request, res: Response) => {
+  try {
+    const { items } = req.body as { items: { id: string, order: number }[] };
+    if (!Array.isArray(items)) {
+      res.status(400).json({ error: 'Expected array of items' });
+      return;
+    }
+
+    const batch = db.batch();
+    for (const item of items) {
+      if (item.id && typeof item.order === 'number') {
+        const ref = subcategoriesRef.doc(item.id);
+        batch.update(ref, { order: item.order });
+      }
+    }
+
+    await batch.commit();
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Failed to reorder subcategories:', error);
+    res.status(500).json({ error: 'Failed to reorder subcategories' });
   }
 });
 

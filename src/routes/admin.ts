@@ -2,7 +2,7 @@
 // Admin-only routes: users, reviews management
 
 import { Router, Request, Response } from 'express';
-import { db } from '../firebase';
+import { db, auth } from '../firebase';
 import { verifyToken } from '../middleware/verifyToken';
 import { requireAdmin } from '../middleware/requireAdmin';
 
@@ -23,8 +23,17 @@ router.get('/users', async (_req: Request, res: Response) => {
 
 // DELETE /api/admin/users/:uid
 router.delete('/users/:uid', async (req: Request, res: Response) => {
+  const uid = String(req.params.uid);
   try {
-    await db.collection('users').doc(String(req.params.uid)).delete();
+    await db.collection('users').doc(uid).delete();
+    try {
+      await auth.deleteUser(uid);
+    } catch (err: any) {
+      // Already gone from Auth (or never existed there) — not fatal.
+      if (err?.code !== 'auth/user-not-found') {
+        console.error('Failed to delete Firebase Auth user:', err);
+      }
+    }
     res.json({ success: true });
   } catch {
     res.status(500).json({ error: 'Failed to delete user.' });

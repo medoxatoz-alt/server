@@ -4,17 +4,25 @@ import { Order } from '../types';
 const formatCurrency = (amount: number) => `Rs. ${amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
 const formatDate = (dateString: string | Date) => new Date(dateString).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
 
-export async function generateInvoicePdf(order: Order): Promise<Buffer> {
-  let logoBuffer: Buffer | null = null;
+// Cached across invocations so we don't re-fetch the logo over the network
+// for every single invoice. A failed fetch is not cached, so it retries next time.
+let cachedLogoBuffer: Buffer | null = null;
+async function getLogoBuffer(): Promise<Buffer | null> {
+  if (cachedLogoBuffer) return cachedLogoBuffer;
   try {
     const logoRes = await fetch('https://ik.imagekit.io/kgigyn2hm/logo-removebg-preview.png');
     if (logoRes.ok) {
       const arrayBuffer = await logoRes.arrayBuffer();
-      logoBuffer = Buffer.from(arrayBuffer);
+      cachedLogoBuffer = Buffer.from(arrayBuffer);
     }
   } catch (err) {
     console.warn('Failed to fetch logo, proceeding without it:', err);
   }
+  return cachedLogoBuffer;
+}
+
+export async function generateInvoicePdf(order: Order): Promise<Buffer> {
+  const logoBuffer = await getLogoBuffer();
 
   return new Promise((resolve, reject) => {
     try {

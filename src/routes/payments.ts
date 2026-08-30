@@ -40,6 +40,25 @@ async function resolveCart(cartItems: Array<{ productId: string; quantity: numbe
 
   if (finalCart.length === 0) throw new Error('EMPTY_CART');
 
+  // Fetch all product docs in parallel instead of one-at-a-time
+  const productSnaps = await Promise.all(
+    finalCart.map(item => db.collection('products').doc(String(item.productId)).get())
+  );
+
+  // Fetch vendor-status docs for the distinct non-admin vendors in parallel too
+  const vendorIds = Array.from(new Set(
+    productSnaps
+      .filter(s => s.exists)
+      .map(s => s.data()!.vendorId)
+      .filter((vid: string | undefined) => vid && vid !== 'admin')
+  )) as string[];
+  const vendorSnaps = await Promise.all(
+    vendorIds.map(vid => db.collection('vendors').doc(vid).get())
+  );
+  const rejectedVendorIds = new Set(
+    vendorSnaps.filter(s => s.exists && s.data()?.status === 'rejected').map(s => s.id)
+  );
+
   let totalAmount = 0;
   const resolvedItems: Array<{
     productId: string; title: string; price: number; qty: number;
@@ -47,16 +66,14 @@ async function resolveCart(cartItems: Array<{ productId: string; quantity: numbe
     weight?: number; length?: number; breadth?: number; height?: number;
   }> = [];
 
-  for (const cartItem of finalCart) {
-    const snap = await db.collection('products').doc(String(cartItem.productId)).get();
+  for (let idx = 0; idx < finalCart.length; idx++) {
+    const cartItem = finalCart[idx];
+    const snap = productSnaps[idx];
     if (!snap.exists) throw new Error(`PRODUCT_NOT_FOUND|${cartItem.productId}`);
     const p = snap.data()!;
 
-    if (p.vendorId && p.vendorId !== 'admin') {
-      const vendorSnap = await db.collection('vendors').doc(p.vendorId).get();
-      if (vendorSnap.exists && vendorSnap.data()?.status === 'rejected') {
-        throw new Error(`PRODUCT_UNAVAILABLE|${cartItem.productId}`);
-      }
+    if (p.vendorId && p.vendorId !== 'admin' && rejectedVendorIds.has(p.vendorId)) {
+      throw new Error(`PRODUCT_UNAVAILABLE|${cartItem.productId}`);
     }
 
     const stock = Number(p.stock) || 0;
@@ -140,7 +157,18 @@ async function createOrdersInFirestore(
     let idx = 0;
     for (const [vendorId, items] of vendorGroups) {
       const vendorTotal = items.reduce((s: number, i: IntentItem) => s + i.subtotal, 0);
-      const orderItems: OrderItem[] = items.map((i: IntentItem) => ({ productId: i.productId, title: i.title, price: i.price, qty: i.qty, subtotal: i.subtotal, image: i.image }));
+      const orderItems: OrderItem[] = items.map((i: IntentItem) => ({ 
+        productId: i.productId, 
+        title: i.title, 
+        price: i.price, 
+        qty: i.qty, 
+        subtotal: i.subtotal, 
+        image: i.image,
+        weight: i.weight,
+        length: i.length,
+        breadth: i.breadth,
+        height: i.height
+      }));
       const newOrderRef = db.collection('orders').doc();
       const orderData: Order = {
         id: newOrderRef.id,
@@ -180,23 +208,23 @@ async function createOrdersInFirestore(
 
 // ── Shared: generate PDF invoices and upload to Storage ──────────────────────
 async function generateInvoices(orderIds: string[]): Promise<string[]> {
-  const urls: string[] = [];
-  for (const orderId of orderIds) {
+  const results = await Promise.all(orderIds.map(async (orderId): Promise<string | null> => {
     try {
       const snap = await db.collection('orders').doc(orderId).get();
-      if (!snap.exists) continue;
+      if (!snap.exists) return null;
       const orderData = snap.data() as Order;
       const pdfBuffer = await generateInvoicePdf(orderData);
       const file = storage.bucket().file(`invoices/${orderData.id}.pdf`);
       await file.save(pdfBuffer, { contentType: 'application/pdf', metadata: { metadata: { orderId: orderData.orderId, customerId: orderData.customerId } } });
       const [url] = await file.getSignedUrl({ action: 'read', expires: Date.now() + 30 * 24 * 60 * 60 * 1000 });
       await db.collection('orders').doc(orderId).update({ invoiceUrl: url });
-      urls.push(url);
+      return url;
     } catch (err) {
       console.error('[Payments] PDF generation failed for order:', orderId, err);
+      return null;
     }
-  }
-  return urls;
+  }));
+  return results.filter((url): url is string => url !== null);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

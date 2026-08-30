@@ -5,7 +5,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { UserSession } from '../types';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-dev-secret';
+const JWT_SECRET = process.env.JWT_SECRET!;
 
 export function verifyToken(req: Request, res: Response, next: NextFunction): void {
   const token = req.cookies?.medox_token as string | undefined;

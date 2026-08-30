@@ -23,6 +23,23 @@ const upload = multer({
   },
 });
 
+// Magic-byte check so a renamed/relabeled non-image file can't slip past the
+// mimetype header alone (which the client controls).
+function isValidImageBuffer(buffer: Buffer): boolean {
+  if (buffer.length < 12) return false;
+  // JPEG
+  if (buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff) return true;
+  // PNG
+  if (buffer[0] === 0x89 && buffer[1] === 0x50 && buffer[2] === 0x4e && buffer[3] === 0x47) return true;
+  // GIF87a / GIF89a
+  if (buffer.toString('ascii', 0, 6) === 'GIF87a' || buffer.toString('ascii', 0, 6) === 'GIF89a') return true;
+  // WEBP (RIFF....WEBP)
+  if (buffer.toString('ascii', 0, 4) === 'RIFF' && buffer.toString('ascii', 8, 12) === 'WEBP') return true;
+  // BMP
+  if (buffer[0] === 0x42 && buffer[1] === 0x4d) return true;
+  return false;
+}
+
 async function uploadToFirebase(fileBuffer: Buffer, mimetype: string, originalName: string): Promise<string> {
   const ext = originalName.split('.').pop() || 'jpg';
   const filePath = `products/${uuidv4()}.${ext}`;
@@ -53,6 +70,10 @@ router.post(
       res.status(400).json({ error: 'No image file provided.' });
       return;
     }
+    if (!isValidImageBuffer(req.file.buffer)) {
+      res.status(400).json({ error: 'File does not appear to be a valid image.' });
+      return;
+    }
 
     try {
       const downloadURL = await uploadToFirebase(req.file.buffer, req.file.mimetype, req.file.originalname);
@@ -74,6 +95,10 @@ router.post(
     const files = req.files as Express.Multer.File[];
     if (!files || files.length === 0) {
       res.status(400).json({ error: 'No images provided.' });
+      return;
+    }
+    if (files.some(f => !isValidImageBuffer(f.buffer))) {
+      res.status(400).json({ error: 'One or more files do not appear to be valid images.' });
       return;
     }
 

@@ -6,12 +6,28 @@ import { db } from '../firebase';
 const router = Router();
 
 // ─────────────────────────────────────────────────────────────────────────────
-// POST /api/shiprocket/webhook
-// Shiprocket calls this with tracking updates (configure in Shiprocket panel:
-// Settings → API → Webhooks → enter your server URL + /api/shiprocket/webhook)
+// POST /api/shipment/webhook
+// Shiprocket calls this with tracking updates. Configure in Shiprocket panel:
+// Settings → API → Webhooks → enter your server URL + /api/shipment/webhook,
+// and set "Token" to the exact value of SHIPROCKET_WEBHOOK_TOKEN below —
+// Shiprocket echoes it back on every call in the `x-api-key` header.
 // ─────────────────────────────────────────────────────────────────────────────
 router.post('/webhook', async (req: Request, res: Response) => {
   try {
+    // ── Verify the shared secret Shiprocket sends back ──────────────────────
+    const expectedToken = process.env.SHIPROCKET_WEBHOOK_TOKEN;
+    if (expectedToken) {
+      const providedToken = req.headers['x-api-key'];
+      if (providedToken !== expectedToken) {
+        console.warn('[Shiprocket Webhook] Invalid or missing x-api-key token');
+        res.status(401).json({ error: 'Invalid webhook token' });
+        return;
+      }
+    } else {
+      // Not configured yet — accept but warn loudly so this doesn't stay silent.
+      console.warn('[Shiprocket Webhook] SHIPROCKET_WEBHOOK_TOKEN not set — webhook is UNAUTHENTICATED. Set it in .env and in the Shiprocket panel.');
+    }
+
     const body = req.body;
 
     // Shiprocket webhook fields (vary by event type)
@@ -54,7 +70,6 @@ router.post('/webhook', async (req: Request, res: Response) => {
     const updateFields: Record<string, any> = {
       shiprocketStatus: srStatus,
       shiprocketStatusCode: srStatusCode,
-      [`shiprocket_${timestamp}`]: srStatus, // audit trail
       timeline: require('firebase-admin').firestore.FieldValue.arrayUnion({
         status: srStatus,
         timestamp,

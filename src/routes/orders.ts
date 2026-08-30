@@ -308,15 +308,12 @@ router.patch('/:id', verifyToken, async (req: Request, res: Response) => {
 
     if (status === 'Rejected') {
       try {
-        // Restore stock
-        for (const item of orderData.items) {
-          const productRef = db.collection('products').doc(String(item.productId));
-          const productSnap = await productRef.get();
-          if (productSnap.exists) {
-            const currentStock = Number(productSnap.data()!.stock) || 0;
-            await productRef.update({ stock: currentStock + item.qty });
-          }
-        }
+        // Restore stock atomically (avoids lost updates from concurrent read-then-write)
+        await Promise.all(orderData.items.map((item: OrderItem) =>
+          db.collection('products').doc(String(item.productId)).update({
+            stock: admin.firestore.FieldValue.increment(item.qty),
+          }).catch(() => {}) // product may have been deleted since — non-fatal
+        ));
         // Cancel Shiprocket shipment if one was created
         if (orderData.shiprocketOrderId) {
           await cancelShiprocketOrder(orderData.shiprocketOrderId);
@@ -343,14 +340,11 @@ router.delete('/:id', verifyToken, requireAdmin, async (req: Request, res: Respo
       const orderData = orderSnap.data()!;
       if (orderData.status === 'Approved') {
         try {
-          for (const item of orderData.items) {
-            const productRef = db.collection('products').doc(String(item.productId));
-            const productSnap = await productRef.get();
-            if (productSnap.exists) {
-              const currentStock = Number(productSnap.data()!.stock) || 0;
-              await productRef.update({ stock: currentStock + item.qty });
-            }
-          }
+          await Promise.all(orderData.items.map((item: OrderItem) =>
+            db.collection('products').doc(String(item.productId)).update({
+              stock: admin.firestore.FieldValue.increment(item.qty),
+            }).catch(() => {})
+          ));
         } catch (err) {
           console.error("Failed to restore stock on order deletion:", err);
         }
@@ -362,8 +356,6 @@ router.delete('/:id', verifyToken, requireAdmin, async (req: Request, res: Respo
     res.status(500).json({ error: 'Failed to delete order.' });
   }
 });
-
-export default router;
 
 // ─────────────────────────────────────────────────────────
 // POST /api/orders/:id/request-cancel
@@ -463,15 +455,12 @@ router.post('/:id/cancel', verifyToken, async (req: Request, res: Response) => {
       }
     }
 
-    // 3. Restore Stock
-    for (const item of orderData.items) {
-      const productRef = db.collection('products').doc(String(item.productId));
-      const productSnap = await productRef.get();
-      if (productSnap.exists) {
-        const currentStock = Number(productSnap.data()!.stock) || 0;
-        await productRef.update({ stock: currentStock + item.qty });
-      }
-    }
+    // 3. Restore Stock atomically
+    await Promise.all(orderData.items.map((item: OrderItem) =>
+      db.collection('products').doc(String(item.productId)).update({
+        stock: admin.firestore.FieldValue.increment(item.qty),
+      }).catch(() => {})
+    ));
 
     // 4. Update Status
     await orderRef.update({
@@ -487,3 +476,5 @@ router.post('/:id/cancel', verifyToken, async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to cancel order.' });
   }
 });
+
+export default router;

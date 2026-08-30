@@ -10,18 +10,37 @@ import { Product } from '../types';
 const router = Router();
 
 // GET /api/products  —  Public: all products
-router.get('/', async (_req: Request, res: Response) => {
+// Pagination is opt-in via ?limit=&cursor= (cursor = last product id from the
+// previous page). Omitting them preserves the original "return everything"
+// behavior so existing callers are unaffected.
+router.get('/', async (req: Request, res: Response) => {
   try {
-    const snap = await db.collection('products').get();
-    const products: Product[] = snap.docs.map(d => ({ id: d.id, ...d.data() } as Product));
+    const limitParam = req.query.limit ? parseInt(String(req.query.limit), 10) : undefined;
+    const cursor = req.query.cursor ? String(req.query.cursor) : undefined;
+    const usePagination = !!limitParam && Number.isFinite(limitParam) && limitParam > 0;
 
-    // Fetch all rejected vendors
-    const rejectedVendorsSnap = await db.collection('vendors').where('status', '==', 'rejected').get();
+    let query: FirebaseFirestore.Query = db.collection('products');
+    if (usePagination) {
+      query = query.orderBy('__name__').limit(limitParam!);
+      if (cursor) query = query.startAfter(cursor);
+    }
+
+    const [snap, rejectedVendorsSnap] = await Promise.all([
+      query.get(),
+      db.collection('vendors').where('status', '==', 'rejected').get(),
+    ]);
+    const products: Product[] = snap.docs.map(d => ({ id: d.id, ...d.data() } as Product));
     const rejectedVendorIds = new Set(rejectedVendorsSnap.docs.map(doc => doc.id));
 
     // Filter out products of rejected vendors
     const filteredProducts = products.filter(p => !p.vendorId || !rejectedVendorIds.has(p.vendorId));
-    res.json(filteredProducts);
+
+    if (usePagination) {
+      const nextCursor = snap.docs.length === limitParam ? snap.docs[snap.docs.length - 1].id : null;
+      res.json({ products: filteredProducts, nextCursor });
+    } else {
+      res.json(filteredProducts);
+    }
   } catch {
     res.status(500).json({ error: 'Failed to fetch products.' });
   }
@@ -106,15 +125,14 @@ router.post('/', verifyToken, requireVendor, async (req: Request, res: Response)
 
     const data: Partial<Product> = {
       ...body,
-      vendorId:    req.user!.uid,
+      ...(req.user!.role !== 'admin' ? { vendorId: req.user!.uid } : {}),
       createdAt:   now,
       updatedAt:   now,
       images:      imagesArray,
       image:       thumbnail,         // backwards-compat single image field
       thumbnail,
-      userReviews: body.userReviews ?? [],
-      rating:      body.rating      ?? 0,
-      reviewCount: body.reviewCount ?? 0,
+      is_sold_by_vendor: req.user!.role !== 'admin',
+
       stock:       Number(body.stock ?? 10),
     };
 
@@ -132,6 +150,22 @@ router.put('/:id', verifyToken, requireVendor, async (req: Request, res: Respons
   try {
     const productRef = db.collection('products').doc(String(req.params.id));
     const body = req.body;
+
+    // ── Ownership check ──────────────────────────────────
+    // A vendor may only edit their own products; admins may edit any.
+    if (req.user!.role !== 'admin') {
+      const existing = await productRef.get();
+      if (!existing.exists) {
+        res.status(404).json({ error: 'Product not found.' });
+        return;
+      }
+      if (existing.data()?.vendorId !== req.user!.uid) {
+        res.status(403).json({ error: 'You do not have permission to edit this product.' });
+        return;
+      }
+      // Non-admins can never reassign ownership via the request body
+      delete (body as any).vendorId;
+    }
 
     // Re-normalise images on edit too
     const rawImagesArray = Array.isArray(body.images) && body.images.length > 0

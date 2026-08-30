@@ -107,14 +107,48 @@ router.delete('/:uid', verifyToken, requireAdmin, async (req: Request, res: Resp
 });
 
 // GET /api/vendors/:uid  —  Fetch a single vendor profile
+// Full profile (email/phone/GST/address) is only returned to the vendor
+// themselves, an admin, or a buyer who has an actual order with this vendor.
+// Everyone else gets a public-safe subset (no PII).
 router.get('/:uid', verifyToken, async (req: Request, res: Response) => {
   try {
-    const snap = await db.collection('vendors').doc(String(req.params.uid)).get();
+    const targetUid = String(req.params.uid);
+    const snap = await db.collection('vendors').doc(targetUid).get();
     if (!snap.exists) {
       res.status(404).json({ error: 'Vendor profile not found.' });
       return;
     }
-    res.json({ uid: snap.id, ...snap.data() });
+    const data = snap.data()!;
+
+    const isSelfOrAdmin = req.user!.uid === targetUid || req.user!.role === 'admin';
+    let canSeeFullProfile = isSelfOrAdmin;
+
+    if (!canSeeFullProfile) {
+      try {
+        const orderSnap = await db.collection('orders')
+          .where('customerId', '==', req.user!.uid)
+          .where('vendorId', '==', targetUid)
+          .limit(1)
+          .get();
+        canSeeFullProfile = !orderSnap.empty;
+      } catch (err) {
+        // If the composite index for (customerId, vendorId) isn't created yet,
+        // fail safe to the public-safe subset rather than 500ing the request.
+        console.error('Vendor-order lookup failed (composite index may be missing):', err);
+        canSeeFullProfile = false;
+      }
+    }
+
+    if (canSeeFullProfile) {
+      res.json({ uid: snap.id, ...data });
+    } else {
+      res.json({
+        uid: snap.id,
+        storeName: data.storeName,
+        status: data.status,
+        createdAt: data.createdAt,
+      });
+    }
   } catch {
     res.status(500).json({ error: 'Failed to fetch vendor profile.' });
   }

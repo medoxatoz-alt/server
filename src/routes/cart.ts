@@ -58,6 +58,10 @@ router.patch('/:productId', verifyToken, async (req: Request, res: Response) => 
   const uid = req.user!.uid;
   const { productId } = req.params;
   const { quantity } = req.body as { quantity: number };
+  if (typeof quantity !== 'number' || !Number.isFinite(quantity)) {
+    res.status(400).json({ error: 'Quantity must be a valid number.' });
+    return;
+  }
   try {
     const cartItemRef = db.collection('users').doc(uid).collection('cart').doc(String(productId));
     if (quantity <= 0) {

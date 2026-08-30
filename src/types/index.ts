@@ -27,6 +27,8 @@ export interface Product {
   length?: number; // cm
   breadth?: number; // cm
   height?: number; // cm
+  attributes?: { key: string; value: string }[];
+  is_sold_by_vendor?: boolean;
   createdAt?: string;
 }
 
