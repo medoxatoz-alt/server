@@ -49,6 +49,19 @@ export async function createShiprocketShipment(order: Order): Promise<{
   const token = await getToken();
   const s = order.shippingDetails;
 
+  // Aggregate package metrics
+  let totalWeight = 0;
+  let maxLength = 1;
+  let maxBreadth = 1;
+  let totalHeight = 0;
+
+  for (const item of order.items) {
+    totalWeight += (item.weight || 0.5) * item.qty;
+    maxLength = Math.max(maxLength, item.length || 10);
+    maxBreadth = Math.max(maxBreadth, item.breadth || 10);
+    totalHeight += (item.height || 10) * item.qty;
+  }
+
   // 1. Create order
   const orderPayload = {
     order_id: order.orderId,
@@ -72,10 +85,10 @@ export async function createShiprocketShipment(order: Order): Promise<{
     })),
     payment_method: order.paymentMethod === 'COD' ? 'COD' : 'Prepaid',
     sub_total: order.totalAmount,
-    length: 10,   // cm — default parcel dimensions
-    breadth: 10,
-    height: 10,
-    weight: 0.5,  // kg — default
+    length: maxLength,
+    breadth: maxBreadth,
+    height: totalHeight,
+    weight: totalWeight,
   };
 
   const createRes = await axios.post(

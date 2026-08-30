@@ -69,7 +69,20 @@ async function resolveCart(cartItems: Array<{ productId: string; quantity: numbe
 
     const subtotal = price * cartItem.quantity;
     totalAmount += subtotal;
-    resolvedItems.push({ productId: cartItem.productId, title: p.title, price, qty: cartItem.quantity, subtotal, image: thumbnail, vendorId: p.vendorId || 'admin', currentStock: stock });
+    resolvedItems.push({ 
+      productId: cartItem.productId, 
+      title: p.title, 
+      price, 
+      qty: cartItem.quantity, 
+      subtotal, 
+      image: thumbnail, 
+      vendorId: p.vendorId || 'admin', 
+      currentStock: stock,
+      weight: p.weight || 0.5,
+      length: p.length || 10,
+      breadth: p.breadth || 10,
+      height: p.height || 10
+    });
   }
 
   return { totalAmount, resolvedItems };
@@ -88,7 +101,7 @@ async function createOrdersInFirestore(
   const orderIdBase = `ORD-${Math.floor(100000 + Math.random() * 900000)}`;
 
   await db.runTransaction(async (transaction) => {
-    type IntentItem = { productId: string; title: string; price: number; qty: number; subtotal: number; image: string; vendorId: string; currentStock: number; };
+    type IntentItem = { productId: string; title: string; price: number; qty: number; subtotal: number; image: string; vendorId: string; currentStock: number; weight?: number; length?: number; breadth?: number; height?: number; };
 
     const vendorGroups = new Map<string, IntentItem[]>();
     for (const item of intent.items as IntentItem[]) {

@@ -23,6 +23,10 @@ export interface Product {
   vendorId?: string;
   rating?: number;
   reviewCount?: number;
+  weight?: number; // kg
+  length?: number; // cm
+  breadth?: number; // cm
+  height?: number; // cm
   createdAt?: string;
 }
 
@@ -39,6 +43,10 @@ export interface OrderItem {
   qty: number;
   subtotal: number;
   image: string;
+  weight?: number;
+  length?: number;
+  breadth?: number;
+  height?: number;
 }
 
 export interface ShippingDetails {
@@ -60,7 +68,7 @@ export interface Order {
   shippingDetails: ShippingDetails;
   items: OrderItem[];
   totalAmount: number;
-  status: 'Approved' | 'Rejected' | 'Delivered';
+  status: 'Approved' | 'Rejected' | 'Delivered' | 'Cancellation Requested' | 'Cancelled';
   paymentMethod: string;
   confirmedOrderId?: string;
   createdAt: string;

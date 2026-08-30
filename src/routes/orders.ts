@@ -7,6 +7,7 @@ import { verifyToken } from '../middleware/verifyToken';
 import { requireAdmin } from '../middleware/requireAdmin';
 import { Order, OrderItem } from '../types';
 import { createShiprocketShipment, cancelShiprocketOrder } from '../utils/shiprocket';
+import axios from 'axios';
 
 
 
@@ -16,9 +17,11 @@ const router = Router();
 // STATUS TRANSITION VALIDATOR
 // ─────────────────────────────────────────────────────────
 const VALID_TRANSITIONS: Record<string, string[]> = {
-  Approved: ['Rejected', 'Delivered'],
+  Approved: ['Rejected', 'Delivered', 'Cancellation Requested'],
+  'Cancellation Requested': ['Cancelled', 'Approved'], // Can be cancelled or denied(revert to approved)
   Rejected: [],     // Terminal state
   Delivered: [],    // Terminal state
+  Cancelled: [],    // Terminal state
 };
 
 function isValidTransition(from: string, to: string): boolean {
@@ -361,3 +364,126 @@ router.delete('/:id', verifyToken, requireAdmin, async (req: Request, res: Respo
 });
 
 export default router;
+
+// ─────────────────────────────────────────────────────────
+// POST /api/orders/:id/request-cancel
+// ─────────────────────────────────────────────────────────
+router.post('/:id/request-cancel', verifyToken, async (req: Request, res: Response) => {
+  try {
+    const orderRef = db.collection('orders').doc(String(req.params.id));
+    const orderSnap = await orderRef.get();
+    if (!orderSnap.exists) {
+      res.status(404).json({ error: 'Order not found.' });
+      return;
+    }
+    const orderData = orderSnap.data() as Order;
+    if (orderData.customerId !== req.user!.uid) {
+      res.status(403).json({ error: 'Unauthorized.' });
+      return;
+    }
+    if (orderData.status !== 'Approved') {
+      res.status(400).json({ error: 'Only Approved orders can be cancelled.' });
+      return;
+    }
+    const orderTime = new Date(orderData.createdAt).getTime();
+    const now = Date.now();
+    const hoursElapsed = (now - orderTime) / (1000 * 60 * 60);
+    if (hoursElapsed > 48) {
+      res.status(400).json({ error: 'Cancellation window (48 hours) has expired.' });
+      return;
+    }
+
+    await orderRef.update({
+      status: 'Cancellation Requested',
+      timeline: admin.firestore.FieldValue.arrayUnion({
+        status: 'Cancellation Requested',
+        timestamp: new Date().toISOString()
+      })
+    });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to request cancellation.' });
+  }
+});
+
+// ─────────────────────────────────────────────────────────
+// POST /api/orders/:id/cancel
+// ─────────────────────────────────────────────────────────
+router.post('/:id/cancel', verifyToken, async (req: Request, res: Response) => {
+  try {
+    const orderRef = db.collection('orders').doc(String(req.params.id));
+    const orderSnap = await orderRef.get();
+    if (!orderSnap.exists) {
+      res.status(404).json({ error: 'Order not found.' });
+      return;
+    }
+    const orderData = orderSnap.data() as Order;
+    
+    // Auth Check
+    if (req.user!.role !== 'admin' && orderData.vendorId !== req.user!.uid) {
+      res.status(403).json({ error: 'Unauthorized.' });
+      return;
+    }
+
+    if (orderData.status !== 'Cancellation Requested' && orderData.status !== 'Approved') {
+      res.status(400).json({ error: 'Order cannot be cancelled.' });
+      return;
+    }
+
+    // 1. Cancel Shiprocket Order
+    if (orderData.shiprocketOrderId) {
+      try {
+        await cancelShiprocketOrder(orderData.shiprocketOrderId);
+      } catch (err) {
+        console.error('Failed to cancel Shiprocket shipment:', err);
+      }
+    }
+
+    // 2. Cashfree Refund
+    if (orderData.cashfreeOrderId && orderData.paymentMethod !== 'COD') {
+      try {
+        const cfEnvironment = process.env.CASHFREE_ENV === 'PRODUCTION'
+          ? 'https://api.cashfree.com/pg'
+          : 'https://sandbox.cashfree.com/pg';
+          
+        await axios.post(`${cfEnvironment}/orders/${orderData.cashfreeOrderId}/refunds`, {
+          refund_amount: orderData.totalAmount,
+          refund_id: `ref_${orderData.orderId}_${Date.now()}`,
+          refund_note: "Cancelled via Dashboard"
+        }, {
+          headers: {
+            'x-client-id': process.env.CASHFREE_APP_ID,
+            'x-client-secret': process.env.CASHFREE_SECRET_KEY,
+            'x-api-version': '2022-09-01'
+          }
+        });
+        console.log(`[Cashfree] Refund initiated for ${orderData.cashfreeOrderId}`);
+      } catch (err: any) {
+        console.error('[Cashfree] Failed to initiate refund:', err?.response?.data || err.message);
+      }
+    }
+
+    // 3. Restore Stock
+    for (const item of orderData.items) {
+      const productRef = db.collection('products').doc(String(item.productId));
+      const productSnap = await productRef.get();
+      if (productSnap.exists) {
+        const currentStock = Number(productSnap.data()!.stock) || 0;
+        await productRef.update({ stock: currentStock + item.qty });
+      }
+    }
+
+    // 4. Update Status
+    await orderRef.update({
+      status: 'Cancelled',
+      timeline: admin.firestore.FieldValue.arrayUnion({
+        status: 'Cancelled',
+        timestamp: new Date().toISOString()
+      })
+    });
+
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to cancel order.' });
+  }
+});
