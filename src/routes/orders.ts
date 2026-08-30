@@ -358,47 +358,6 @@ router.delete('/:id', verifyToken, requireAdmin, async (req: Request, res: Respo
 });
 
 // ─────────────────────────────────────────────────────────
-// POST /api/orders/:id/request-cancel
-// ─────────────────────────────────────────────────────────
-router.post('/:id/request-cancel', verifyToken, async (req: Request, res: Response) => {
-  try {
-    const orderRef = db.collection('orders').doc(String(req.params.id));
-    const orderSnap = await orderRef.get();
-    if (!orderSnap.exists) {
-      res.status(404).json({ error: 'Order not found.' });
-      return;
-    }
-    const orderData = orderSnap.data() as Order;
-    if (orderData.customerId !== req.user!.uid) {
-      res.status(403).json({ error: 'Unauthorized.' });
-      return;
-    }
-    if (orderData.status !== 'Approved') {
-      res.status(400).json({ error: 'Only Approved orders can be cancelled.' });
-      return;
-    }
-    const orderTime = new Date(orderData.createdAt).getTime();
-    const now = Date.now();
-    const hoursElapsed = (now - orderTime) / (1000 * 60 * 60);
-    if (hoursElapsed > 48) {
-      res.status(400).json({ error: 'Cancellation window (48 hours) has expired.' });
-      return;
-    }
-
-    await orderRef.update({
-      status: 'Cancellation Requested',
-      timeline: admin.firestore.FieldValue.arrayUnion({
-        status: 'Cancellation Requested',
-        timestamp: new Date().toISOString()
-      })
-    });
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to request cancellation.' });
-  }
-});
-
-// ─────────────────────────────────────────────────────────
 // POST /api/orders/:id/cancel
 // ─────────────────────────────────────────────────────────
 router.post('/:id/cancel', verifyToken, async (req: Request, res: Response) => {
@@ -417,7 +376,7 @@ router.post('/:id/cancel', verifyToken, async (req: Request, res: Response) => {
       return;
     }
 
-    if (orderData.status !== 'Cancellation Requested' && orderData.status !== 'Approved') {
+    if (orderData.status !== 'Approved') {
       res.status(400).json({ error: 'Order cannot be cancelled.' });
       return;
     }

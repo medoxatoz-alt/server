@@ -32,8 +32,19 @@
       const products: Product[] = snap.docs.map(d => ({ id: d.id, ...d.data() } as Product));
       const rejectedVendorIds = new Set(rejectedVendorsSnap.docs.map(doc => doc.id));
 
+      const searchParam = req.query.search ? String(req.query.search).toLowerCase() : undefined;
+
       // Filter out products of rejected vendors
-      const filteredProducts = products.filter(p => !p.vendorId || !rejectedVendorIds.has(p.vendorId));
+      let filteredProducts = products.filter(p => !p.vendorId || !rejectedVendorIds.has(p.vendorId));
+
+      if (searchParam) {
+        filteredProducts = filteredProducts.filter(p => {
+          const t = p.title?.toLowerCase() || '';
+          const b = p.brand?.toLowerCase() || '';
+          const sc = p.subCategoryId?.toLowerCase() || '';
+          return t.includes(searchParam) || b.includes(searchParam)    || sc.includes(searchParam);
+        });
+      }
 
       if (usePagination) {
         const nextCursor = snap.docs.length === limitParam ? snap.docs[snap.docs.length - 1].id : null;

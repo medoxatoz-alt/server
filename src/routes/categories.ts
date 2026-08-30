@@ -11,7 +11,7 @@ export const MAIN_CATEGORIES = [
   { id: 'dermatology-equipment', name: 'Dermatology Equipment' },
   { id: 'makeup-beauty', name: 'Makeup & Beauty Products' },
   
-  { id: 'medical-products', name: 'All HOSP DEPT WISE PRODUCTS' },
+  { id: 'medical-products', name: 'All Hosp Dept Wise Products' },
   { id: 'surgical-products', name: 'Surgical Products' },
 
   { id: 'diagnostic-products', name: 'Diagnostic Products' },
