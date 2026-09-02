@@ -1,5 +1,5 @@
 // src/routes/auth.ts
-// Handles login (email/password + Google), logout, and /me
+// Handles login (email/password + phone OTP), logout, and /me
 
 import { Router, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
@@ -73,21 +73,24 @@ router.post('/register', async (req: Request, res: Response) => {
     
     const uid = userRecord.uid;
     const userEmail = userRecord.email!;
+    const lowerEmail = userEmail.toLowerCase();
 
-    // Create user document in Firestore
+    // Create user document in Firestore. Role must match the same ADMIN_EMAIL
+    // check every other auth path (login, verify, resolveRole) uses -- this used
+    // to always write 'buyer' even for the admin email, leaving the Firestore doc
+    // out of sync with the role resolveRole() would report for the same account.
     await db.collection('users').doc(uid).set({
       name,
-      email: userEmail.toLowerCase(),
+      email: lowerEmail,
       phone: '',
-      role: 'buyer',
+      role: lowerEmail === ADMIN_EMAIL ? 'admin' : 'buyer',
       createdAt: new Date().toISOString(),
     });
 
-    const session = await resolveRole(uid, userEmail);
-    const token = jwt.sign(session, JWT_SECRET, { expiresIn: '7d' });
-
-    res.cookie('medox_token', token, COOKIE_OPTS);
-    res.status(201).json({ success: true, user: session });
+    // Don't log the user in yet -- the Admin SDK can create the account but can't
+    // send mail itself, so the client signs in just long enough to trigger
+    // Firebase's own verification email, then calls /auth/login once it's confirmed.
+    res.status(201).json({ success: true, requiresVerification: true });
   } catch (err: any) {
     console.error('Register error:', err);
     const code = err.code;
@@ -128,6 +131,20 @@ router.post('/login', async (req: Request, res: Response) => {
 
     const uid = data.localId;
     const userEmail = (data.email as string).toLowerCase();
+
+    // The REST sign-in call above only checks the password. Email verification
+    // status has to come from the Admin SDK (the same source resolveRole/register
+    // trust), applied uniformly -- including to the admin account, which is why
+    // scripts/verify-admin-email.js exists to bootstrap it rather than the code
+    // special-casing ADMIN_EMAIL around this check.
+    const userRecord = await auth.getUser(uid);
+    if (!userRecord.emailVerified) {
+      res.status(403).json({
+        error: 'Please verify your email before signing in. Check your inbox for the verification link.',
+        code: 'EMAIL_NOT_VERIFIED',
+      });
+      return;
+    }
 
     // Admin bypass: if this is the admin email, ensure the Firestore doc exists
     if (userEmail === ADMIN_EMAIL) {
