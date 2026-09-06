@@ -258,7 +258,19 @@ router.post('/cashfree/create-order', verifyToken, async (req: Request, res: Res
     const cfOrderId = `CF_${req.user!.uid}_${Date.now()}`;
     const frontendUrl = process.env.FRONTEND_URL || req.headers.origin || "https://medoxatoz.com";
     const backendUrl = process.env.BACKEND_URL || "https://server-production-e4da.up.railway.app";
-    const returnUrl = `${frontendUrl}/checkout/status?cashfree_order_id=${cfOrderId}`;
+
+    // Requests from the Medox app's WebView carry a "MedoxApp/" marker appended to an
+    // otherwise-normal mobile browser UA (see medox-app's App.tsx). This only decides
+    // which return_url Cashfree redirects to on completion -- it's routing, not a
+    // security control. The app has no return path back into a webpage, so it needs
+    // its own custom-scheme return_url; the site's existing return_url is untouched
+    // for every other caller.
+    const isApp = /MedoxApp\//.test(req.headers['user-agent'] as string || '');
+    const state = crypto.randomBytes(24).toString('base64url');
+    const STATE_TTL_MS = 30 * 60 * 1000; // matches the checkout session's expected lifetime
+    const returnUrl = isApp
+      ? `medox://payment-callback?state=${state}`
+      : `${frontendUrl}/checkout/status?cashfree_order_id=${cfOrderId}`;
 
     const cfRequest = {
       order_id: cfOrderId,
@@ -295,9 +307,15 @@ router.post('/cashfree/create-order', verifyToken, async (req: Request, res: Res
       items: resolvedItems,
       status: 'created',
       createdAt: new Date().toISOString(),
+      state,
+      stateExpiresAt: admin.firestore.Timestamp.fromMillis(Date.now() + STATE_TTL_MS),
     });
 
-    res.json({ payment_session_id: sessionId, cashfree_order_id: cfOrderId });
+    res.json({
+      payment_session_id: sessionId,
+      cashfree_order_id: cfOrderId,
+      environment: cfEnvironment === CFEnvironment.PRODUCTION ? 'PRODUCTION' : 'SANDBOX',
+    });
   } catch (err: any) {
     console.error('[Cashfree] create-order error:', err?.response?.data || err.message);
     if (err.message === 'EMPTY_CART') { res.status(400).json({ error: 'Cart is empty.' }); return; }
@@ -495,6 +513,40 @@ router.post('/cashfree/verify', verifyToken, async (req: Request, res: Response)
   } catch (err: any) {
     console.error('[Cashfree] verify error:', err?.response?.data || err.message);
     res.status(500).json({ error: 'Failed to verify payment.' });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// POST /api/payments/cashfree/resolve-state
+// Called by the app's WebView (via /checkout/app-return) after the system browser
+// hands control back to the app with an opaque `state` from the medox:// callback.
+// The state is only an unpredictable lookup key, never a credential on its own --
+// it must resolve to a paymentIntent owned by the *authenticated* caller, and it
+// must not have expired. This never confirms payment; it only maps state -> the
+// Cashfree order id, so the app can hand off to the same /checkout/status ->
+// /cashfree/verify flow the browser already uses.
+// ─────────────────────────────────────────────────────────────────────────────
+router.post('/cashfree/resolve-state', verifyToken, async (req: Request, res: Response) => {
+  const { state } = req.body as { state: string };
+  if (!state) { res.status(400).json({ error: 'Missing state.' }); return; }
+
+  try {
+    const snap = await db.collection('paymentIntents').where('state', '==', state).limit(1).get();
+    const intent = snap.docs[0]?.data();
+
+    if (!intent || !intent.stateExpiresAt || intent.stateExpiresAt.toMillis() <= Date.now()) {
+      res.status(404).json({ error: 'Invalid or expired state.' });
+      return;
+    }
+    if (intent.customerId !== req.user!.uid) {
+      res.status(403).json({ error: 'Unauthorized.' });
+      return;
+    }
+
+    res.json({ cashfree_order_id: intent.cashfreeOrderId });
+  } catch (err: any) {
+    console.error('[Cashfree] resolve-state error:', err.message);
+    res.status(500).json({ error: 'Failed to resolve state.' });
   }
 });
 

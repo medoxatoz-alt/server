@@ -176,7 +176,7 @@ router.post('/login', async (req: Request, res: Response) => {
   }
 });
 
-// POST /api/auth/verify  —  Verify Firebase ID Token (from Google/OTP) and create session
+// POST /api/auth/verify  —  Verify Firebase ID Token (from phone OTP) and create session
 router.post('/verify', async (req: Request, res: Response) => {
   const { idToken, name, isSignup } = req.body as { idToken: string; name?: string; isSignup?: boolean };
 
