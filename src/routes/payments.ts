@@ -258,14 +258,21 @@ router.post('/cashfree/create-order', verifyToken, async (req: Request, res: Res
     const cfOrderId = `CF_${req.user!.uid}_${Date.now()}`;
     const frontendUrl = process.env.FRONTEND_URL || req.headers.origin || "https://medoxatoz.com";
     const backendUrl = process.env.BACKEND_URL || "https://server-production-e4da.up.railway.app";
-    // Same return_url for everyone, app included -- confirmed empirically that
-    // Cashfree's own client-side redirect won't complete to a custom URI scheme
-    // (medox://...), so the app can't rely on Cashfree handing control back at
-    // all. Instead, medox-app detects the app returning to the foreground after
-    // checkout (AppState) and drives the WebView to this same status page itself,
-    // using the cashfree_order_id it already has from create-order's response --
-    // no dependence on this return_url ever actually being reached.
-    const returnUrl = `${frontendUrl}/checkout/status?cashfree_order_id=${cfOrderId}`;
+    // Same return_url page for everyone -- confirmed empirically that Cashfree's
+    // own client-side redirect won't complete to a custom URI scheme (medox://...),
+    // so the app can't rely on Cashfree handing control back that way. medox-app
+    // instead detects the app returning to the foreground after checkout
+    // (AppState) and drives the WebView to this same status page itself, using
+    // the cashfree_order_id it already has from create-order's response -- no
+    // dependence on this return_url ever actually being reached by the app.
+    //
+    // The `app=1` marker is just UI routing (shows a "Go Back to App" button on
+    // /checkout/status instead of "Continue Shopping") -- it's a plain query
+    // param on an ordinary https URL, so it survives Cashfree's redirect fine;
+    // it's not the medox:// scheme, which is what Cashfree's own JS wouldn't
+    // navigate to.
+    const isApp = /MedoxApp\//.test(req.headers['user-agent'] as string || '');
+    const returnUrl = `${frontendUrl}/checkout/status?cashfree_order_id=${cfOrderId}${isApp ? '&app=1' : ''}`;
 
     const cfRequest = {
       order_id: cfOrderId,
