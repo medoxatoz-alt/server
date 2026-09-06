@@ -264,7 +264,10 @@ router.post('/cashfree/create-order', verifyToken, async (req: Request, res: Res
     // which return_url Cashfree redirects to on completion -- it's routing, not a
     // security control. The app has no return path back into a webpage, so it needs
     // its own custom-scheme return_url; the site's existing return_url is untouched
-    // for every other caller.
+    // for every other caller. (App-flow checkout runs entirely in the system browser,
+    // opened fresh from /checkout/pay -- see CheckoutModal.tsx -- so this return_url
+    // navigation is a plain same-tab redirect Cashfree's own JS makes at the end of
+    // payment, not something being replayed across browser contexts.)
     const isApp = /MedoxApp\//.test(req.headers['user-agent'] as string || '');
     const state = crypto.randomBytes(24).toString('base64url');
     const STATE_TTL_MS = 30 * 60 * 1000; // matches the checkout session's expected lifetime
