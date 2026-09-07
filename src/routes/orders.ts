@@ -7,6 +7,7 @@ import { verifyToken } from '../middleware/verifyToken';
 import { requireAdmin } from '../middleware/requireAdmin';
 import { Order, OrderItem } from '../types';
 import { createShiprocketShipment, cancelShiprocketOrder } from '../utils/shiprocket';
+import { restoreStock } from '../utils/variantStock';
 import axios from 'axios';
 
 
@@ -16,16 +17,45 @@ const router = Router();
 // ─────────────────────────────────────────────────────────
 // STATUS TRANSITION VALIDATOR
 // ─────────────────────────────────────────────────────────
+// No 'Rejected' transition -- cancellation (POST /:id/cancel) is the only
+// way an order can end besides being delivered. 'Rejected' stays a valid
+// value on historical documents (see the Order type), just nothing can
+// write it anymore. 'Cancellation Requested' is dropped too: only a vendor
+// or admin can ever PATCH an order (see canManageOrder below) -- there was
+// never a way for a customer to request cancellation, so this state was
+// unreachable dead weight; the real cancel flow (POST /:id/cancel) already
+// goes straight from Approved to Cancelled in one step.
 const VALID_TRANSITIONS: Record<string, string[]> = {
-  Approved: ['Rejected', 'Delivered', 'Cancellation Requested'],
-  'Cancellation Requested': ['Cancelled', 'Approved'], // Can be cancelled or denied(revert to approved)
-  Rejected: [],     // Terminal state
+  Approved: ['Delivered'],
   Delivered: [],    // Terminal state
   Cancelled: [],    // Terminal state
 };
 
 function isValidTransition(from: string, to: string): boolean {
   return (VALID_TRANSITIONS[from] || []).includes(to);
+}
+
+// An order can be acted on by the vendor who owns it, or by an admin acting
+// on an admin-owned order -- never by an admin on a specific vendor's order.
+//
+// vendorId is ALWAYS a real Firebase uid on both sides (a vendor's own uid,
+// or the creating admin's own uid for admin-listed products) -- there is no
+// literal 'admin' sentinel actually written anywhere by products.ts, so
+// checking for that string was a no-op bug.
+//
+// A vendor can only ever manage their own orders (uid match, no DB read
+// needed -- unambiguous). For an admin, trust the `sellerIsAdmin` flag
+// snapshotted onto the order at creation time when present (fast path, lets
+// *any* admin manage an admin-owned order, not just the one who happened to
+// create the product). Orders placed before that flag existed fall back to
+// authoritatively looking up the actual role of whoever owns `vendorId` --
+// this is the real source of truth, not another string-matching guess.
+async function canManageOrder(orderData: { vendorId: string; sellerIsAdmin?: boolean }, user: { uid: string; role: string }): Promise<boolean> {
+  if (user.role !== 'admin') return orderData.vendorId === user.uid;
+  if (orderData.sellerIsAdmin !== undefined) return orderData.sellerIsAdmin;
+  if (!orderData.vendorId || orderData.vendorId === user.uid) return true;
+  const ownerSnap = await db.collection('users').doc(orderData.vendorId).get();
+  return ownerSnap.exists && ownerSnap.data()?.role === 'admin';
 }
 
 // ─────────────────────────────────────────────────────────
@@ -239,19 +269,9 @@ router.patch('/:id', verifyToken, async (req: Request, res: Response) => {
     const currentStatus: string = orderData.status;
 
     // ── Ownership check ──────────────────────────────────
-    const isVendorMatch = orderData.vendorId === req.user!.uid;
-    const isAdminMatch = orderData.vendorId === 'admin' && req.user!.role === 'admin';
-
-    if (!isVendorMatch && !isAdminMatch) {
+    if (!(await canManageOrder(orderData as { vendorId: string }, req.user!))) {
       res.status(403).json({
         error: 'Unauthorized. Only the creator who owns this order can update it.',
-      });
-      return;
-    }
-    
-    if (req.user!.role === 'admin' && orderData.vendorId !== 'admin') {
-      res.status(403).json({
-        error: 'Administrators cannot modify orders belonging to specific vendors.',
       });
       return;
     }
@@ -306,23 +326,6 @@ router.patch('/:id', verifyToken, async (req: Request, res: Response) => {
       });
     }
 
-    if (status === 'Rejected') {
-      try {
-        // Restore stock atomically (avoids lost updates from concurrent read-then-write)
-        await Promise.all(orderData.items.map((item: OrderItem) =>
-          db.collection('products').doc(String(item.productId)).update({
-            stock: admin.firestore.FieldValue.increment(item.qty),
-          }).catch(() => {}) // product may have been deleted since — non-fatal
-        ));
-        // Cancel Shiprocket shipment if one was created
-        if (orderData.shiprocketOrderId) {
-          await cancelShiprocketOrder(orderData.shiprocketOrderId);
-        }
-      } catch (err) {
-        console.error('Failed to restore stock or cancel shipment on rejection:', err);
-      }
-    }
-
     res.json({ success: true });
   } catch {
     res.status(500).json({ error: 'Failed to update order.' });
@@ -340,11 +343,7 @@ router.delete('/:id', verifyToken, requireAdmin, async (req: Request, res: Respo
       const orderData = orderSnap.data()!;
       if (orderData.status === 'Approved') {
         try {
-          await Promise.all(orderData.items.map((item: OrderItem) =>
-            db.collection('products').doc(String(item.productId)).update({
-              stock: admin.firestore.FieldValue.increment(item.qty),
-            }).catch(() => {})
-          ));
+          await restoreStock(orderData.items as OrderItem[]);
         } catch (err) {
           console.error("Failed to restore stock on order deletion:", err);
         }
@@ -371,7 +370,7 @@ router.post('/:id/cancel', verifyToken, async (req: Request, res: Response) => {
     const orderData = orderSnap.data() as Order;
     
     // Auth Check
-    if (req.user!.role !== 'admin' && orderData.vendorId !== req.user!.uid) {
+    if (!(await canManageOrder(orderData as { vendorId: string }, req.user!))) {
       res.status(403).json({ error: 'Unauthorized.' });
       return;
     }
@@ -414,12 +413,8 @@ router.post('/:id/cancel', verifyToken, async (req: Request, res: Response) => {
       }
     }
 
-    // 3. Restore Stock atomically
-    await Promise.all(orderData.items.map((item: OrderItem) =>
-      db.collection('products').doc(String(item.productId)).update({
-        stock: admin.firestore.FieldValue.increment(item.qty),
-      }).catch(() => {})
-    ));
+    // 3. Restore Stock
+    await restoreStock(orderData.items as OrderItem[]);
 
     // 4. Update Status
     await orderRef.update({

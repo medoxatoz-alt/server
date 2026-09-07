@@ -118,6 +118,115 @@ export async function createShiprocketShipment(order: Order): Promise<{
   return { shiprocketOrderId, shiprocketShipmentId, awbCode, courierName, trackingLink };
 }
 
+// ── Pickup pincode (cached) ────────────────────────────────────────────────────
+// Shiprocket's serviceability API needs the actual pickup postcode, not the
+// pickup location name from SHIPROCKET_PICKUP_LOCATION -- resolve it once
+// from Shiprocket's own registered pickup addresses instead of duplicating
+// it into a second env var that could drift out of sync.
+let pickupPincodeCache: { pincode: string; expiresAt: number } | null = null;
+const PICKUP_PINCODE_TTL_MS = 24 * 60 * 60 * 1000; // 1 day
+
+async function getPickupPincode(): Promise<string> {
+  if (pickupPincodeCache && Date.now() < pickupPincodeCache.expiresAt) {
+    return pickupPincodeCache.pincode;
+  }
+  const token = await getToken();
+  const { data } = await axios.get(`${SHIPROCKET_BASE}/settings/company/pickup`, { headers: authHeaders(token) });
+  const pickupLocationName = process.env.SHIPROCKET_PICKUP_LOCATION || 'Primary';
+  const addresses: any[] = data?.data?.shipping_address || [];
+  const match = addresses.find(a => a.pickup_location === pickupLocationName) || addresses[0];
+  if (!match?.pin_code) throw new Error('Could not resolve a Shiprocket pickup pincode.');
+
+  pickupPincodeCache = { pincode: String(match.pin_code), expiresAt: Date.now() + PICKUP_PINCODE_TTL_MS };
+  return pickupPincodeCache.pincode;
+}
+
+// ── Serviceability / delivery estimate (cached per pincode+weight) ────────────
+export interface ServiceabilityResult {
+  serviceable: boolean;
+  estimatedDeliveryDate?: string; // 'YYYY-MM-DD'
+  courierName?: string;
+}
+
+const serviceabilityCache = new Map<string, { result: ServiceabilityResult; expiresAt: number }>();
+const SERVICEABILITY_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours -- real courier ETDs, but no need to hit Shiprocket on every page view
+
+function toDateOnly(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+// Shiprocket's `etd` field is a display string like "Sep 10, 2026" (confirmed
+// against the live API -- not the "YYYY-MM-DD HH:mm:ss" its docs suggest).
+// Node's Date constructor parses that format reliably, so use it directly
+// rather than string-splitting. Falls back to today + `estimated_delivery_days`
+// (calendar days, matching how couriers quote total transit time) when `etd`
+// is missing or unparseable for a given courier.
+function normalizeEtd(courier: any): string | undefined {
+  if (typeof courier.etd === 'string' && courier.etd.trim()) {
+    const parsed = new Date(courier.etd);
+    if (!isNaN(parsed.getTime())) return toDateOnly(parsed);
+  }
+  const days = Number(courier.estimated_delivery_days);
+  if (Number.isFinite(days) && days > 0) {
+    const d = new Date();
+    d.setDate(d.getDate() + days);
+    return toDateOnly(d);
+  }
+  return undefined;
+}
+
+// Real courier-quoted delivery estimate for a pincode, via Shiprocket's own
+// serviceability check -- the same data Shiprocket itself uses to decide
+// which couriers can even deliver there. Falls back to
+// `{ serviceable: true }` (no date) on any failure so the caller can fall
+// back to a generic estimate rather than breaking the page.
+export async function checkServiceability(deliveryPincode: string, weightKg: number): Promise<ServiceabilityResult> {
+  const roundedWeight = Math.max(0.1, Math.ceil(weightKg * 2) / 2); // round up to nearest 0.5kg for cache reuse
+  const cacheKey = `${deliveryPincode}:${roundedWeight}`;
+  const cached = serviceabilityCache.get(cacheKey);
+  if (cached && Date.now() < cached.expiresAt) return cached.result;
+
+  try {
+    const [token, pickupPincode] = await Promise.all([getToken(), getPickupPincode()]);
+    const { data } = await axios.get(`${SHIPROCKET_BASE}/courier/serviceability/`, {
+      headers: authHeaders(token),
+      params: {
+        pickup_postcode: pickupPincode,
+        delivery_postcode: deliveryPincode,
+        weight: roundedWeight,
+        cod: 0,
+      },
+    });
+
+    const couriers: any[] = data?.data?.available_courier_companies || [];
+    let result: ServiceabilityResult;
+
+    if (couriers.length === 0) {
+      result = { serviceable: false };
+    } else {
+      const recommendedId = data?.data?.recommended_courier_company_id;
+      const byFastestEtd = [...couriers].sort((a, b) => {
+        const da = a.estimated_delivery_days != null ? Number(a.estimated_delivery_days) : 99;
+        const db = b.estimated_delivery_days != null ? Number(b.estimated_delivery_days) : 99;
+        return da - db;
+      });
+      const chosen = couriers.find(c => c.courier_company_id === recommendedId) || byFastestEtd[0];
+
+      result = {
+        serviceable: true,
+        estimatedDeliveryDate: normalizeEtd(chosen),
+        courierName: chosen.courier_name,
+      };
+    }
+
+    serviceabilityCache.set(cacheKey, { result, expiresAt: Date.now() + SERVICEABILITY_TTL_MS });
+    return result;
+  } catch (err: any) {
+    console.error('[Shiprocket] Serviceability check failed:', err?.response?.data || err.message);
+    return { serviceable: true }; // fail open -- caller falls back to a generic estimate
+  }
+}
+
 // ── Cancel a Shiprocket order ─────────────────────────────────────────────────
 export async function cancelShiprocketOrder(shiprocketOrderId: number): Promise<void> {
   try {

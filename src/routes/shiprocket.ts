@@ -1,9 +1,33 @@
-// src/routes/shiprocket.ts — Shiprocket tracking webhook
+// src/routes/shiprocket.ts — Shiprocket tracking webhook + serviceability
 
 import { Router, Request, Response } from 'express';
 import { db } from '../firebase';
+import { verifyToken } from '../middleware/verifyToken';
+import { checkServiceability } from '../utils/shiprocket';
 
 const router = Router();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GET /api/shipment/serviceability?pincode=XXXXXX&weight=Y
+// Real delivery-date estimate for a pincode, from Shiprocket's own
+// serviceability check (same data Shiprocket uses to route the order) --
+// used by the product page's delivery estimate widget.
+// ─────────────────────────────────────────────────────────────────────────────
+router.get('/serviceability', verifyToken, async (req: Request, res: Response) => {
+  const pincode = String(req.query.pincode || '').trim();
+  if (!/^\d{6}$/.test(pincode)) {
+    res.status(400).json({ error: 'A valid 6-digit pincode is required.' });
+    return;
+  }
+  const weight = Number(req.query.weight);
+
+  try {
+    const result = await checkServiceability(pincode, Number.isFinite(weight) && weight > 0 ? weight : 0.5);
+    res.json(result);
+  } catch {
+    res.status(500).json({ error: 'Failed to check delivery serviceability.' });
+  }
+});
 
 // ─────────────────────────────────────────────────────────────────────────────
 // POST /api/shipment/webhook

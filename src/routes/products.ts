@@ -1,13 +1,101 @@
   // src/routes/products.ts
 
   import { Router, Request, Response } from 'express';
+  import crypto from 'crypto';
+  import * as admin from 'firebase-admin';
   import { db } from '../firebase';
   import { verifyToken } from '../middleware/verifyToken';
   import { requireVendor } from '../middleware/requireVendor';
   import { requireAdmin } from '../middleware/requireAdmin';
-  import { Product } from '../types';
+  import { Product, ProductVariant } from '../types';
 
   const router = Router();
+
+  // Variants are now the only way price/mrp/stock/images are entered -- a
+  // "simple" product is just one variant row; a product with sizes has more
+  // than one. Normalises raw rows from the request body, throwing a
+  // descriptive Error (caught by the route and turned into a 400) on any
+  // invalid input, since there's no longer a base-field fallback to fall
+  // back to.
+  const MAX_VARIANT_IMAGES = 5;
+
+  function normaliseVariants(raw: any): ProductVariant[] {
+    if (!Array.isArray(raw) || raw.length === 0) {
+      throw new Error('At least one product option (price/stock) is required.');
+    }
+
+    const variants: ProductVariant[] = raw.map((v: any) => {
+      const price = Math.max(0, Number(v?.price) || 0);
+      if (!v?.price || price <= 0) {
+        throw new Error('Every option needs a price greater than 0.');
+      }
+      const rawMrp = v.mrp !== undefined && v.mrp !== null && v.mrp !== '' ? Math.max(0, Number(v.mrp) || 0) : undefined;
+      return {
+        id: typeof v.id === 'string' && v.id.trim() !== '' ? v.id : crypto.randomUUID(),
+        label: typeof v.label === 'string' ? v.label.trim().slice(0, 100) : '',
+        price,
+        mrp: rawMrp,
+        stock: Math.max(0, Math.floor(Number(v.stock) || 0)),
+        images: Array.isArray(v.images)
+          ? v.images.filter((img: any) => typeof img === 'string' && img.trim() !== '').slice(0, MAX_VARIANT_IMAGES)
+          : undefined,
+      };
+    });
+
+    if (variants.length > 1) {
+      const labels = variants.map(v => v.label.toLowerCase());
+      if (labels.some(l => l === '')) {
+        throw new Error('Please label each option so shoppers can tell them apart.');
+      }
+      if (new Set(labels).size !== labels.length) {
+        throw new Error('Option labels must be unique.');
+      }
+    }
+
+    return variants;
+  }
+
+  // The single place price/mrp/stock/images come from: the cheapest
+  // variant's price/mrp, summed stock across all variants, and images taken
+  // from the cheapest variant (or the first variant that has any). Every
+  // screen that only reads the flat fields (ProductCard, admin/vendor
+  // tables, search, wishlist) keeps working unchanged, whether the product
+  // has one option or several.
+  function applyVariantAggregate(data: Record<string, any>, variants: ProductVariant[]) {
+    const cheapest = variants.reduce((min, v) => (v.price < min.price ? v : min), variants[0]);
+    data.price = cheapest.price;
+    data.mrp = cheapest.mrp;
+    data.stock = variants.reduce((sum, v) => sum + (Number(v.stock) || 0), 0);
+
+    const imageSource = cheapest.images && cheapest.images.length > 0
+      ? cheapest
+      : variants.find(v => v.images && v.images.length > 0);
+    const images = imageSource?.images || [];
+    data.images = images;
+    data.image = images[0] || 'https://via.placeholder.com/200?text=No+Image';
+    data.thumbnail = images[0] || data.image;
+    data.variants = variants;
+  }
+
+  // "How to Use" resources -- one PDF (already uploaded via /api/upload/pdf,
+  // so this just validates it's a plausible URL) plus up to 5 named links.
+  // These belong to the product as a whole, never per-variant.
+  const MAX_RESOURCE_LINKS = 5;
+
+  function normaliseResourceLinks(raw: any): { label: string; url: string }[] {
+    if (!Array.isArray(raw)) return [];
+    return raw
+      .filter((l: any) => l && typeof l.url === 'string' && l.url.trim() !== '')
+      .slice(0, MAX_RESOURCE_LINKS)
+      .map((l: any) => {
+        const url = String(l.url).trim();
+        if (!/^https?:\/\//i.test(url)) {
+          throw new Error('Links must start with http:// or https://');
+        }
+        const label = typeof l.label === 'string' && l.label.trim() !== '' ? l.label.trim().slice(0, 60) : 'Link';
+        return { label, url };
+      });
+  }
 
   // GET /api/products  —  Public: all products
   // Pagination is opt-in via ?limit=&cursor= (cursor = last product id from the
@@ -125,27 +213,35 @@
       const now = new Date().toISOString();
       const body = req.body;
 
-      // Normalise images: support both `images` (array) and legacy `image` (string)
-      const imagesArray: string[] = Array.isArray(body.images) && body.images.length > 0
-        ? body.images
-        : body.image
-          ? [body.image]
-          : [];
-
-      const thumbnail: string = body.thumbnail || imagesArray[0] || '';
+      let variants: ProductVariant[];
+      let resourceLinks: { label: string; url: string }[];
+      try {
+        variants = normaliseVariants(body.variants);
+        resourceLinks = normaliseResourceLinks(body.resourceLinks);
+      } catch (err: any) {
+        res.status(400).json({ error: err.message });
+        return;
+      }
 
       const data: Partial<Product> = {
         ...body,
         vendorId: req.user!.uid,
         createdAt:   now,
         updatedAt:   now,
-        images:      imagesArray,
-        image:       thumbnail,         // backwards-compat single image field
-        thumbnail,
         is_sold_by_vendor: req.user!.role !== 'admin',
-
-        stock:       Number(body.stock ?? 10),
       };
+      delete (data as any).image;
+      delete (data as any).images;
+      delete (data as any).thumbnail;
+
+      applyVariantAggregate(data, variants);
+
+      data.resourceLinks = resourceLinks;
+      if (typeof body.howToUsePdf === 'string' && body.howToUsePdf.trim()) {
+        data.howToUsePdf = body.howToUsePdf.trim();
+      } else {
+        delete (data as any).howToUsePdf;
+      }
 
       const ref = await db.collection('products').add(data);
       await ref.update({ id: ref.id });
@@ -178,17 +274,37 @@
         delete (body as any).vendorId;
       }
 
-      // Re-normalise images on edit too
-      const rawImagesArray = Array.isArray(body.images) && body.images.length > 0
-        ? body.images
-        : Array.isArray(body.image) ? body.image : body.image ? [body.image] : [];
-      
-      // Ensure it's a flat array of strings
-      const imagesArray: string[] = rawImagesArray.flat().filter((img: any) => typeof img === 'string' && img.trim() !== '');
+      // Variants are the only source of price/mrp/stock/images now -- always
+      // required, at least one row.
+      let variants: ProductVariant[];
+      let resourceLinks: { label: string; url: string }[];
+      try {
+        variants = normaliseVariants(body.variants);
+        resourceLinks = normaliseResourceLinks(body.resourceLinks);
+      } catch (err: any) {
+        res.status(400).json({ error: err.message });
+        return;
+      }
+      const variantsUpdate: Record<string, any> = {};
+      applyVariantAggregate(variantsUpdate, variants);
+      delete (body as any).variants;
+      delete (body as any).image;
+      delete (body as any).images;
+      delete (body as any).thumbnail;
 
-      const thumbnail: string = typeof body.thumbnail === 'string' && body.thumbnail.trim() !== ''
-          ? body.thumbnail 
-          : imagesArray[0] || '';
+      // resourceLinks is always written as whatever survived validation
+      // (possibly an empty array -- clearing all links). howToUsePdf is only
+      // set when a real URL is present; an explicit empty string means the
+      // form removed it, so the field is deleted outright ({merge:true}
+      // would otherwise never clear it).
+      const resourcesUpdate: Record<string, any> = { resourceLinks };
+      if (typeof body.howToUsePdf === 'string' && body.howToUsePdf.trim()) {
+        resourcesUpdate.howToUsePdf = body.howToUsePdf.trim();
+      } else {
+        resourcesUpdate.howToUsePdf = admin.firestore.FieldValue.delete();
+      }
+      delete (body as any).resourceLinks;
+      delete (body as any).howToUsePdf;
 
       // Remove any undefined values that somehow snuck in
       const cleanBody = Object.fromEntries(
@@ -197,9 +313,8 @@
 
       await productRef.set({
         ...cleanBody,
-        images: imagesArray,
-        image:  thumbnail,
-        thumbnail,
+        ...variantsUpdate,
+        ...resourcesUpdate,
         updatedAt: new Date().toISOString(),
       }, { merge: true });
       res.json({ success: true });

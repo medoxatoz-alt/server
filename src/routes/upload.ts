@@ -23,6 +23,18 @@ const upload = multer({
   },
 });
 
+const uploadPdf = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB
+  fileFilter: (_req, file, cb) => {
+    if (file.mimetype === 'application/pdf') {
+      cb(null, true);
+    } else {
+      cb(new Error('Only PDF files are allowed.'));
+    }
+  },
+});
+
 // Magic-byte check so a renamed/relabeled non-image file can't slip past the
 // mimetype header alone (which the client controls).
 function isValidImageBuffer(buffer: Buffer): boolean {
@@ -40,9 +52,14 @@ function isValidImageBuffer(buffer: Buffer): boolean {
   return false;
 }
 
-async function uploadToFirebase(fileBuffer: Buffer, mimetype: string, originalName: string): Promise<string> {
+// PDF files start with the "%PDF-" signature.
+function isValidPdfBuffer(buffer: Buffer): boolean {
+  return buffer.length >= 5 && buffer.toString('ascii', 0, 5) === '%PDF-';
+}
+
+async function uploadToFirebase(fileBuffer: Buffer, mimetype: string, originalName: string, folder: string = 'products'): Promise<string> {
   const ext = originalName.split('.').pop() || 'jpg';
-  const filePath = `products/${uuidv4()}.${ext}`;
+  const filePath = `${folder}/${uuidv4()}.${ext}`;
   const bucket = storage.bucket();
   const file = bucket.file(filePath);
   const downloadToken = uuidv4();
@@ -109,6 +126,32 @@ router.post(
     } catch (err) {
       console.error('Multiple image upload failed:', err);
       res.status(500).json({ error: 'Image upload failed.' });
+    }
+  }
+);
+
+// POST /api/upload/pdf  —  Upload a "How to Use" PDF for a product
+router.post(
+  '/pdf',
+  verifyToken,
+  requireVendor,
+  uploadPdf.single('pdf'),
+  async (req: Request, res: Response) => {
+    if (!req.file) {
+      res.status(400).json({ error: 'No PDF file provided.' });
+      return;
+    }
+    if (!isValidPdfBuffer(req.file.buffer)) {
+      res.status(400).json({ error: 'File does not appear to be a valid PDF.' });
+      return;
+    }
+
+    try {
+      const downloadURL = await uploadToFirebase(req.file.buffer, req.file.mimetype, req.file.originalname, 'product-guides');
+      res.json({ url: downloadURL });
+    } catch (err) {
+      console.error('PDF upload failed:', err);
+      res.status(500).json({ error: 'PDF upload failed.' });
     }
   }
 );

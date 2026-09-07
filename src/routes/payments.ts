@@ -9,6 +9,7 @@ import { verifyToken } from '../middleware/verifyToken';
 import { Order, OrderItem } from '../types';
 import { generateInvoicePdf } from '../utils/pdfGenerator';
 import { createShiprocketShipment } from '../utils/shiprocket';
+import { resolveEffectiveVariant, applyStockDelta } from '../utils/variantResolution';
 
 const router = Router();
 
@@ -26,17 +27,24 @@ const cashfreeClient = new Cashfree(
 const CF_API_VERSION = '2023-08-01';
 
 // ── Shared: validate cart, calculate total, resolve items ────────────────────
-async function resolveCart(cartItems: Array<{ productId: string; quantity: number }>) {
-  // Consolidate duplicates
-  const consolidated = new Map<string, number>();
+async function resolveCart(cartItems: Array<{ productId: string; quantity: number; variantId?: string }>) {
+  // Consolidate duplicates. Keyed on productId + variantId together so two
+  // different variants of the same product stay as separate lines instead of
+  // being merged into one (a plain productId-only key would collapse them).
+  const consolidated = new Map<string, { productId: string; variantId?: string; quantity: number }>();
   for (const item of cartItems) {
     if (!item.productId) continue;
-    consolidated.set(item.productId, (consolidated.get(item.productId) || 0) + (Number(item.quantity) || 0));
+    const variantId = typeof item.variantId === 'string' && item.variantId.trim() !== '' ? item.variantId : undefined;
+    const key = `${item.productId}::${variantId ?? ''}`;
+    const existing = consolidated.get(key);
+    consolidated.set(key, {
+      productId: item.productId,
+      variantId,
+      quantity: (existing?.quantity || 0) + (Number(item.quantity) || 0),
+    });
   }
 
-  const finalCart = Array.from(consolidated.entries())
-    .map(([productId, quantity]) => ({ productId, quantity }))
-    .filter(i => i.quantity > 0);
+  const finalCart = Array.from(consolidated.values()).filter(i => i.quantity > 0);
 
   if (finalCart.length === 0) throw new Error('EMPTY_CART');
 
@@ -64,6 +72,7 @@ async function resolveCart(cartItems: Array<{ productId: string; quantity: numbe
     productId: string; title: string; price: number; qty: number;
     subtotal: number; image: string; vendorId: string; currentStock: number;
     weight?: number; length?: number; breadth?: number; height?: number;
+    variantId?: string; variantLabel?: string; sellerIsAdmin: boolean;
   }> = [];
 
   for (let idx = 0; idx < finalCart.length; idx++) {
@@ -76,30 +85,37 @@ async function resolveCart(cartItems: Array<{ productId: string; quantity: numbe
       throw new Error(`PRODUCT_UNAVAILABLE|${cartItem.productId}`);
     }
 
-    const stock = Number(p.stock) || 0;
-    if (stock < cartItem.quantity) throw new Error(`INSUFFICIENT_STOCK|${p.title}|${stock}`);
+    // Resolve where this item's price/stock/image actually live -- the
+    // matching variant, an inferred single variant, or the flat fields (see
+    // variantResolution.ts for the exact rule).
+    const target = resolveEffectiveVariant(p, cartItem.variantId);
+    if (!target) throw new Error(`PRODUCT_NOT_FOUND|${cartItem.productId}`);
 
-    const price = typeof p.price === 'string' ? parseFloat(p.price.replace(/,/g, '')) : Number(p.price) || 0;
-    const imageField = p.images || p.image;
-    let thumbnail = '';
-    if (Array.isArray(imageField)) thumbnail = imageField[0] || '';
-    else if (typeof imageField === 'string') thumbnail = imageField;
+    const resolvedLabel = target.source === 'variant' ? p.variants?.[target.index!]?.label : undefined;
+    if (target.stock < cartItem.quantity) {
+      throw new Error(`INSUFFICIENT_STOCK|${resolvedLabel ? `${p.title} (${resolvedLabel})` : p.title}|${target.stock}`);
+    }
 
-    const subtotal = price * cartItem.quantity;
+    const subtotal = target.price * cartItem.quantity;
     totalAmount += subtotal;
-    resolvedItems.push({ 
-      productId: cartItem.productId, 
-      title: p.title, 
-      price, 
-      qty: cartItem.quantity, 
-      subtotal, 
-      image: thumbnail, 
-      vendorId: p.vendorId || 'admin', 
-      currentStock: stock,
+    resolvedItems.push({
+      productId: cartItem.productId,
+      title: p.title,
+      price: target.price,
+      qty: cartItem.quantity,
+      subtotal,
+      image: target.images[0] || '',
+      vendorId: p.vendorId || 'admin',
+      currentStock: target.stock,
       weight: p.weight || 0.5,
       length: p.length || 10,
       breadth: p.breadth || 10,
-      height: p.height || 10
+      height: p.height || 10,
+      variantId: target.source === 'variant' ? p.variants?.[target.index!]?.id : undefined,
+      variantLabel: resolvedLabel,
+      // The reliable admin/vendor distinction -- vendorId itself is always
+      // a real Firebase uid on both sides, never a special sentinel.
+      sellerIsAdmin: !p.is_sold_by_vendor,
     });
   }
 
@@ -120,7 +136,7 @@ async function createOrdersInFirestore(
   const orderIdBase = `ORD-${Math.floor(100000 + Math.random() * 900000)}`;
 
   await db.runTransaction(async (transaction) => {
-    type IntentItem = { productId: string; title: string; price: number; qty: number; subtotal: number; image: string; vendorId: string; currentStock: number; weight?: number; length?: number; breadth?: number; height?: number; };
+    type IntentItem = { productId: string; title: string; price: number; qty: number; subtotal: number; image: string; vendorId: string; currentStock: number; weight?: number; length?: number; breadth?: number; height?: number; variantId?: string; variantLabel?: string; sellerIsAdmin?: boolean; };
 
     const vendorGroups = new Map<string, IntentItem[]>();
     for (const item of intent.items as IntentItem[]) {
@@ -139,41 +155,67 @@ async function createOrdersInFirestore(
       }
     }
 
+    // One read per distinct product.
     const productRefs = new Map<string, admin.firestore.DocumentReference>();
-    const newStocks = new Map<string, number>();
-
+    const productData = new Map<string, FirebaseFirestore.DocumentData>();
     for (const item of intent.items as IntentItem[]) {
-      const ref = db.collection('products').doc(String(item.productId));
-      productRefs.set(item.productId, ref);
-      const snap = await transaction.get(ref);
-      if (!snap.exists) throw new Error(`PRODUCT_NOT_FOUND|${item.productId}`);
-      const currentStock = Number(snap.data()!.stock) || 0;
-      const totalQty = (intent.items as IntentItem[]).filter(i => i.productId === item.productId).reduce((s, i) => s + Number(i.qty), 0);
-      if (currentStock < totalQty) throw new Error(`INSUFFICIENT_STOCK|${item.title}|${currentStock}`);
-      newStocks.set(item.productId, currentStock - totalQty);
+      if (!productRefs.has(item.productId)) {
+        const ref = db.collection('products').doc(String(item.productId));
+        productRefs.set(item.productId, ref);
+        const snap = await transaction.get(ref);
+        if (!snap.exists) throw new Error(`PRODUCT_NOT_FOUND|${item.productId}`);
+        productData.set(item.productId, snap.data()!);
+      }
+    }
+
+    // Apply each item's deduction against the running, in-memory copy of its
+    // product's data (re-resolved fresh here, not reusing resolveCart's
+    // pre-transaction resolution) -- so two lines for the same product (e.g.
+    // two different variants) both see each other's effect, and the flat
+    // `stock` mirror stays correct after every step.
+    for (const item of intent.items as IntentItem[]) {
+      const data = productData.get(item.productId)!;
+      const target = resolveEffectiveVariant(data, item.variantId);
+      if (!target) throw new Error(`PRODUCT_NOT_FOUND|${item.productId}`);
+      if (target.stock < item.qty) {
+        throw new Error(`INSUFFICIENT_STOCK|${target.label ? `${data.title} (${target.label})` : data.title}|${target.stock}`);
+      }
+      const update = applyStockDelta(data, target, -Number(item.qty));
+      productData.set(item.productId, { ...data, ...update });
+    }
+
+    const productUpdates = new Map<string, Record<string, any>>();
+    for (const [productId, data] of productData) {
+      const update: Record<string, any> = { stock: data.stock };
+      if (Array.isArray(data.variants)) update.variants = data.variants;
+      productUpdates.set(productId, update);
     }
 
     // All writes
     let idx = 0;
     for (const [vendorId, items] of vendorGroups) {
       const vendorTotal = items.reduce((s: number, i: IntentItem) => s + i.subtotal, 0);
-      const orderItems: OrderItem[] = items.map((i: IntentItem) => ({ 
-        productId: i.productId, 
-        title: i.title, 
-        price: i.price, 
-        qty: i.qty, 
-        subtotal: i.subtotal, 
+      const orderItems: OrderItem[] = items.map((i: IntentItem) => ({
+        productId: i.productId,
+        title: i.title,
+        price: i.price,
+        qty: i.qty,
+        subtotal: i.subtotal,
         image: i.image,
         weight: i.weight,
         length: i.length,
         breadth: i.breadth,
-        height: i.height
+        height: i.height,
+        variantId: i.variantId,
+        variantLabel: i.variantLabel,
       }));
       const newOrderRef = db.collection('orders').doc();
       const orderData: Order = {
         id: newOrderRef.id,
         orderId: `${orderIdBase}-${idx + 1}`,
         vendorId,
+        // Every item in a vendor group shares the same seller by construction.
+        sellerIsAdmin: !!items[0]?.sellerIsAdmin,
         customerId: intent.customerId,
         customerEmail: intent.customerEmail,
         shippingDetails: intent.shippingDetails,
@@ -189,8 +231,8 @@ async function createOrdersInFirestore(
       createdOrderIds.push(newOrderRef.id);
       idx++;
     }
-    for (const [pId, stock] of newStocks) {
-      transaction.update(productRefs.get(pId)!, { stock });
+    for (const [pId, updates] of productUpdates) {
+      transaction.update(productRefs.get(pId)!, updates);
     }
     
     if (intentRef) {
