@@ -102,6 +102,36 @@ router.post('/sub', verifyToken, requireAdmin, async (req: Request, res: Respons
 });
 
 // ─────────────────────────────────────────────────────────
+// PUT /api/categories/sub/:id
+// Admin renames a subcategory document
+// ─────────────────────────────────────────────────────────
+router.put('/sub/:id', verifyToken, requireAdmin, async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id as string;
+    const { name } = req.body as { name?: string };
+
+    if (!name || typeof name !== 'string' || !name.trim()) {
+      res.status(400).json({ error: 'Name is required' });
+      return;
+    }
+
+    const subDoc = await subcategoriesRef.doc(id).get();
+    if (!subDoc.exists) {
+      res.status(404).json({ error: 'Subcategory not found' });
+      return;
+    }
+
+    const trimmedName = name.trim();
+    await subcategoriesRef.doc(id).update({ name: trimmedName });
+
+    res.json({ success: true, id, name: trimmedName });
+  } catch (error) {
+    console.error('Failed to rename subcategory:', error);
+    res.status(500).json({ error: 'Failed to rename subcategory' });
+  }
+});
+
+// ─────────────────────────────────────────────────────────
 // DELETE /api/categories/sub/:id
 // Admin deletes a subcategory document
 // ─────────────────────────────────────────────────────────

@@ -250,12 +250,13 @@ router.post('/', verifyToken, async (req: Request, res: Response) => {
 // PATCH /api/orders/:id  —  Update order status
 // Strict ownership + valid transition enforcement
 // ─────────────────────────────────────────────────────────
+// The only reachable transition today is Approved -> Delivered (orders are
+// created directly with status 'Approved', and nothing in VALID_TRANSITIONS
+// leads back into 'Approved'), so there are no post-update side effects to
+// run here anymore -- Shiprocket shipment creation now happens once, at
+// order-creation time (orders.ts POST '/', payments.ts webhook/verify).
 router.patch('/:id', verifyToken, async (req: Request, res: Response) => {
-  const { status, trackingId, trackingLink } = req.body as {
-    status: string;
-    trackingId?: string;  // optional — Shiprocket auto-fills this
-    trackingLink?: string; // optional — Shiprocket auto-fills this
-  };
+  const { status } = req.body as { status: string };
   try {
     const orderRef = db.collection('orders').doc(String(req.params.id));
     const orderSnap = await orderRef.get();
@@ -266,7 +267,6 @@ router.patch('/:id', verifyToken, async (req: Request, res: Response) => {
     }
 
     const orderData = orderSnap.data()!;
-    const currentStatus: string = orderData.status;
 
     // ── Ownership check ──────────────────────────────────
     if (!(await canManageOrder(orderData as { vendorId: string }, req.user!))) {
@@ -276,54 +276,37 @@ router.patch('/:id', verifyToken, async (req: Request, res: Response) => {
       return;
     }
 
-    // ── Transition validation ────────────────────────────
-    if (!isValidTransition(currentStatus, status)) {
+    // ── Atomic transition + update ────────────────────────
+    // Reading currentStatus and writing the new one inside the same
+    // transaction (rather than the previous get-then-update) closes a race
+    // where two concurrent PATCH calls could both read the same
+    // pre-transition status and both apply the transition, appending a
+    // duplicate timeline entry.
+    const result = await db.runTransaction(async (transaction) => {
+      const snap = await transaction.get(orderRef);
+      if (!snap.exists) return { ok: false as const, currentStatus: undefined };
+      const currentStatus: string = snap.data()!.status;
+      if (!isValidTransition(currentStatus, status)) return { ok: false as const, currentStatus };
+
+      const timestamp = new Date().toISOString();
+      transaction.update(orderRef, {
+        status,
+        [`${status.toLowerCase()}At`]: timestamp,
+        timeline: admin.firestore.FieldValue.arrayUnion({ status, timestamp }),
+      });
+      return { ok: true as const, currentStatus };
+    });
+
+    if (!result.ok) {
+      const currentStatus = result.currentStatus;
+      if (currentStatus === undefined) {
+        res.status(404).json({ error: 'Order not found.' });
+        return;
+      }
       res.status(400).json({
         error: `Invalid status transition: ${currentStatus} → ${status}. Allowed: ${(VALID_TRANSITIONS[currentStatus] || []).join(', ') || 'none (terminal state)'}`,
       });
       return;
-    }
-
-    // trackingId/trackingLink are now optional — Shiprocket fills them automatically on approval
-
-    // ── Apply update with timeline entry ─────────────────
-    const timestamp = new Date().toISOString();
-    const timelineEntry = { status, timestamp };
-
-    const updateFields: any = {
-      status,
-      [`${status.toLowerCase()}At`]: timestamp,
-      timeline: admin.firestore.FieldValue.arrayUnion(timelineEntry),
-    };
-
-    // Preserve any manually supplied tracking fields (fallback)
-    if (status === 'Approved' && trackingId?.trim()) updateFields.trackingId = trackingId.trim();
-    if (status === 'Approved' && trackingLink?.trim()) updateFields.trackingLink = trackingLink.trim();
-
-    await orderRef.update(updateFields);
-
-    // ── Post-update side-effects ──────────────────────────────────────────────
-    if (status === 'Approved') {
-      // Auto-create Shiprocket shipment and save AWB tracking info
-      setImmediate(async () => {
-        try {
-          const fullOrderSnap = await orderRef.get();
-          const fullOrder = fullOrderSnap.data() as Order;
-          const sr = await createShiprocketShipment(fullOrder);
-          await orderRef.update({
-            shiprocketOrderId: sr.shiprocketOrderId,
-            shiprocketShipmentId: sr.shiprocketShipmentId,
-            awbCode: sr.awbCode,
-            courierName: sr.courierName,
-            trackingId: sr.awbCode || fullOrder.trackingId,
-            trackingLink: sr.trackingLink || fullOrder.trackingLink,
-          });
-          console.log(`[Shiprocket] Shipment created for order ${orderData.orderId}: AWB=${sr.awbCode}`);
-        } catch (srErr: any) {
-          console.error('[Shiprocket] Failed to create shipment:', srErr.message);
-          // Non-fatal — order is still approved
-        }
-      });
     }
 
     res.json({ success: true });
@@ -338,18 +321,26 @@ router.patch('/:id', verifyToken, async (req: Request, res: Response) => {
 router.delete('/:id', verifyToken, requireAdmin, async (req: Request, res: Response) => {
   try {
     const orderRef = db.collection('orders').doc(String(req.params.id));
-    const orderSnap = await orderRef.get();
-    if (orderSnap.exists) {
-      const orderData = orderSnap.data()!;
-      if (orderData.status === 'Approved') {
-        try {
-          await restoreStock(orderData.items as OrderItem[]);
-        } catch (err) {
-          console.error("Failed to restore stock on order deletion:", err);
-        }
+
+    // Atomically claim the delete (read status + delete the doc in one
+    // transaction) so two concurrent deletes of the same order can't both
+    // read status === 'Approved' and both restore stock. Only the winner
+    // gets a non-null `items` back.
+    const items = await db.runTransaction(async (transaction) => {
+      const snap = await transaction.get(orderRef);
+      if (!snap.exists) return null;
+      const orderData = snap.data()!;
+      transaction.delete(orderRef);
+      return orderData.status === 'Approved' ? (orderData.items as OrderItem[]) : [];
+    });
+
+    if (items && items.length > 0) {
+      try {
+        await restoreStock(items);
+      } catch (err) {
+        console.error("Failed to restore stock on order deletion:", err);
       }
     }
-    await orderRef.delete();
     res.json({ success: true });
   } catch {
     res.status(500).json({ error: 'Failed to delete order.' });
@@ -368,14 +359,34 @@ router.post('/:id/cancel', verifyToken, async (req: Request, res: Response) => {
       return;
     }
     const orderData = orderSnap.data() as Order;
-    
+
     // Auth Check
     if (!(await canManageOrder(orderData as { vendorId: string }, req.user!))) {
       res.status(403).json({ error: 'Unauthorized.' });
       return;
     }
 
-    if (orderData.status !== 'Approved') {
+    // Atomically claim the cancellation by flipping status inside a
+    // transaction *before* touching Shiprocket/Cashfree/stock. Two
+    // concurrent cancel requests (double-click, a client retry) would
+    // otherwise both read status === 'Approved' via a plain .get() and both
+    // run the refund + stock-restore side effects -- a real double-refund
+    // risk. Only the request that wins this transaction proceeds; the loser
+    // sees the already-flipped status and bails before any side effect runs.
+    const claimed = await db.runTransaction(async (transaction) => {
+      const snap = await transaction.get(orderRef);
+      if (!snap.exists || snap.data()?.status !== 'Approved') return false;
+      transaction.update(orderRef, {
+        status: 'Cancelled',
+        timeline: admin.firestore.FieldValue.arrayUnion({
+          status: 'Cancelled',
+          timestamp: new Date().toISOString()
+        })
+      });
+      return true;
+    });
+
+    if (!claimed) {
       res.status(400).json({ error: 'Order cannot be cancelled.' });
       return;
     }
@@ -415,15 +426,6 @@ router.post('/:id/cancel', verifyToken, async (req: Request, res: Response) => {
 
     // 3. Restore Stock
     await restoreStock(orderData.items as OrderItem[]);
-
-    // 4. Update Status
-    await orderRef.update({
-      status: 'Cancelled',
-      timeline: admin.firestore.FieldValue.arrayUnion({
-        status: 'Cancelled',
-        timestamp: new Date().toISOString()
-      })
-    });
 
     res.json({ success: true });
   } catch (err) {

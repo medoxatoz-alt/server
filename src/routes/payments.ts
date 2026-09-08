@@ -248,6 +248,39 @@ async function createOrdersInFirestore(
   return createdOrderIds;
 }
 
+// ── Shared: push newly-created orders to Shiprocket ───────────────────────────
+// Called from both the webhook and the /verify fallback -- whichever of the
+// two actually ends up creating the orders (only one ever does, guarded by
+// the paymentIntent's 'paid' status) is responsible for also shipping them,
+// since the other path short-circuits on ALREADY_PROCESSED and never reaches
+// this step.
+function pushOrdersToShiprocket(orderIds: string[]) {
+  setImmediate(async () => {
+    for (const id of orderIds) {
+      try {
+        const snap = await db.collection('orders').doc(id).get();
+        if (!snap.exists) continue;
+        const fullOrder = snap.data() as Order;
+        const sr = await createShiprocketShipment(fullOrder);
+        await db.collection('orders').doc(id).update({
+          shiprocketOrderId: sr.shiprocketOrderId,
+          shiprocketShipmentId: sr.shiprocketShipmentId,
+          awbCode: sr.awbCode,
+          courierName: sr.courierName,
+          trackingId: sr.awbCode,
+          trackingLink: sr.trackingLink,
+        });
+        console.log(`[Shiprocket] Shipment created for Cashfree order ${fullOrder.orderId}: AWB=${sr.awbCode}`);
+      } catch (err: any) {
+        console.error('[Shiprocket] Failed to create shipment for order', id, ':', err.message);
+        if (err.response) {
+          console.error('[Shiprocket] Response Data:', JSON.stringify(err.response.data, null, 2));
+        }
+      }
+    }
+  });
+}
+
 // ── Shared: generate PDF invoices and upload to Storage ──────────────────────
 async function generateInvoices(orderIds: string[]): Promise<string[]> {
   const results = await Promise.all(orderIds.map(async (orderId): Promise<string | null> => {
@@ -460,30 +493,7 @@ router.post('/cashfree/webhook', async (req: Request, res: Response) => {
     }).catch(() => {});
 
     // Auto-push to Shiprocket
-    setImmediate(async () => {
-      for (const id of orderIds) {
-        try {
-          const snap = await db.collection('orders').doc(id).get();
-          if (!snap.exists) continue;
-          const fullOrder = snap.data() as Order;
-          const sr = await createShiprocketShipment(fullOrder);
-          await db.collection('orders').doc(id).update({
-            shiprocketOrderId: sr.shiprocketOrderId,
-            shiprocketShipmentId: sr.shiprocketShipmentId,
-            awbCode: sr.awbCode,
-            courierName: sr.courierName,
-            trackingId: sr.awbCode,
-            trackingLink: sr.trackingLink,
-          });
-          console.log(`[Shiprocket] Shipment created for Cashfree order ${fullOrder.orderId}: AWB=${sr.awbCode}`);
-        } catch (err: any) {
-          console.error('[Shiprocket] Failed to create shipment for order', id, ':', err.message);
-          if (err.response) {
-            console.error('[Shiprocket] Response Data:', JSON.stringify(err.response.data, null, 2));
-          }
-        }
-      }
-    });
+    pushOrdersToShiprocket(orderIds);
 
     res.status(200).json({ received: true });
   } catch (err: any) {
@@ -540,6 +550,7 @@ router.post('/cashfree/verify', verifyToken, async (req: Request, res: Response)
       }
 
       const invoiceUrls = await generateInvoices(orderIds);
+      pushOrdersToShiprocket(orderIds);
 
       return res.status(201).json({ success: true, orderIds, invoiceUrls }) as any;
     }
