@@ -38,6 +38,16 @@ function authHeaders(token: string) {
   return { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
 }
 
+// Deep link back to this order in the admin portal -- Shiprocket access is
+// admin-only (both for the platform's own orders and every vendor's, since
+// vendors have no Shiprocket access of their own), so every shipment's
+// comment always points at the admin dashboard's "All Orders" view,
+// regardless of who the order actually belongs to.
+function buildOrderPortalLink(order: Order): string {
+  const frontendUrl = process.env.FRONTEND_URL || 'https://medoxatoz.com';
+  return `${frontendUrl}/admin?tab=all-orders&orderId=${encodeURIComponent(order.id || '')}`;
+}
+
 // ── Create Shiprocket order + assign AWB ──────────────────────────────────────
 export async function createShiprocketShipment(order: Order): Promise<{
   shiprocketOrderId: number;
@@ -89,6 +99,9 @@ export async function createShiprocketShipment(order: Order): Promise<{
     breadth: maxBreadth,
     height: totalHeight,
     weight: totalWeight,
+    // Shows up on this order inside Shiprocket's own dashboard -- a direct
+    // link back to it in the admin or vendor portal (see buildOrderPortalLink).
+    comment: `Medox order: ${buildOrderPortalLink(order)}`,
   };
 
   const createRes = await axios.post(

@@ -98,6 +98,7 @@ async function resolveCart(cartItems: Array<{ productId: string; quantity: numbe
 
     const subtotal = target.price * cartItem.quantity;
     totalAmount += subtotal;
+    const variantId = target.source === 'variant' ? p.variants?.[target.index!]?.id : undefined;
     resolvedItems.push({
       productId: cartItem.productId,
       title: p.title,
@@ -111,8 +112,12 @@ async function resolveCart(cartItems: Array<{ productId: string; quantity: numbe
       length: p.length || 10,
       breadth: p.breadth || 10,
       height: p.height || 10,
-      variantId: target.source === 'variant' ? p.variants?.[target.index!]?.id : undefined,
-      variantLabel: resolvedLabel,
+      // Omitted entirely (not set to `undefined`) for a flat-priced item --
+      // Firestore rejects any document field explicitly valued `undefined`,
+      // which was silently breaking checkout for exactly this case (a
+      // product with no matching single variant).
+      ...(variantId ? { variantId } : {}),
+      ...(resolvedLabel ? { variantLabel: resolvedLabel } : {}),
       // The reliable admin/vendor distinction -- vendorId itself is always
       // a real Firebase uid on both sides, never a special sentinel.
       sellerIsAdmin: !p.is_sold_by_vendor,
@@ -195,6 +200,8 @@ async function createOrdersInFirestore(
     let idx = 0;
     for (const [vendorId, items] of vendorGroups) {
       const vendorTotal = items.reduce((s: number, i: IntentItem) => s + i.subtotal, 0);
+      // variantId/variantLabel omitted entirely (not set to `undefined`) for
+      // a flat-priced item -- see the matching comment in resolveCart above.
       const orderItems: OrderItem[] = items.map((i: IntentItem) => ({
         productId: i.productId,
         title: i.title,
@@ -206,8 +213,8 @@ async function createOrdersInFirestore(
         length: i.length,
         breadth: i.breadth,
         height: i.height,
-        variantId: i.variantId,
-        variantLabel: i.variantLabel,
+        ...(i.variantId ? { variantId: i.variantId } : {}),
+        ...(i.variantLabel ? { variantLabel: i.variantLabel } : {}),
       }));
       const newOrderRef = db.collection('orders').doc();
       const orderData: Order = {

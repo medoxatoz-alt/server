@@ -30,15 +30,20 @@
         throw new Error('Every option needs a price greater than 0.');
       }
       const rawMrp = v.mrp !== undefined && v.mrp !== null && v.mrp !== '' ? Math.max(0, Number(v.mrp) || 0) : undefined;
+      const images = Array.isArray(v.images)
+        ? v.images.filter((img: any) => typeof img === 'string' && img.trim() !== '').slice(0, MAX_VARIANT_IMAGES)
+        : undefined;
+      // mrp/images omitted entirely (not set to `undefined`) when absent --
+      // this array is written straight into the product document, and
+      // Firestore rejects a write containing an explicit `undefined` at any
+      // depth, including inside an array element like this one.
       return {
         id: typeof v.id === 'string' && v.id.trim() !== '' ? v.id : crypto.randomUUID(),
         label: typeof v.label === 'string' ? v.label.trim().slice(0, 100) : '',
         price,
-        mrp: rawMrp,
         stock: Math.max(0, Math.floor(Number(v.stock) || 0)),
-        images: Array.isArray(v.images)
-          ? v.images.filter((img: any) => typeof img === 'string' && img.trim() !== '').slice(0, MAX_VARIANT_IMAGES)
-          : undefined,
+        ...(rawMrp !== undefined ? { mrp: rawMrp } : {}),
+        ...(images !== undefined ? { images } : {}),
       };
     });
 
@@ -61,10 +66,19 @@
   // screen that only reads the flat fields (ProductCard, admin/vendor
   // tables, search, wishlist) keeps working unchanged, whether the product
   // has one option or several.
-  function applyVariantAggregate(data: Record<string, any>, variants: ProductVariant[]) {
+  // `forMerge` distinguishes the two callers: POST builds a brand-new
+  // document (a plain omitted key is enough), while PUT merges into an
+  // existing one (an omitted key leaves whatever was already stored, so an
+  // mrp that's no longer present on any variant must be explicitly cleared
+  // with a delete sentinel instead).
+  function applyVariantAggregate(data: Record<string, any>, variants: ProductVariant[], forMerge: boolean) {
     const cheapest = variants.reduce((min, v) => (v.price < min.price ? v : min), variants[0]);
     data.price = cheapest.price;
-    data.mrp = cheapest.mrp;
+    if (cheapest.mrp !== undefined) {
+      data.mrp = cheapest.mrp;
+    } else if (forMerge) {
+      data.mrp = admin.firestore.FieldValue.delete();
+    }
     data.stock = variants.reduce((sum, v) => sum + (Number(v.stock) || 0), 0);
 
     const imageSource = cheapest.images && cheapest.images.length > 0
@@ -234,7 +248,7 @@
       delete (data as any).images;
       delete (data as any).thumbnail;
 
-      applyVariantAggregate(data, variants);
+      applyVariantAggregate(data, variants, false);
 
       data.resourceLinks = resourceLinks;
       if (typeof body.howToUsePdf === 'string' && body.howToUsePdf.trim()) {
@@ -286,7 +300,7 @@
         return;
       }
       const variantsUpdate: Record<string, any> = {};
-      applyVariantAggregate(variantsUpdate, variants);
+      applyVariantAggregate(variantsUpdate, variants, true);
       delete (body as any).variants;
       delete (body as any).image;
       delete (body as any).images;

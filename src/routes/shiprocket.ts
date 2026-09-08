@@ -93,13 +93,18 @@ router.post('/webhook', async (req: Request, res: Response) => {
 
     const updateFields: Record<string, any> = {
       shiprocketStatus: srStatus,
-      shiprocketStatusCode: srStatusCode,
       timeline: require('firebase-admin').firestore.FieldValue.arrayUnion({
         status: srStatus,
         timestamp,
         source: 'Shiprocket',
       }),
     };
+    // srStatusCode is only present on some Shiprocket event types -- omit the
+    // key entirely rather than writing an explicit `undefined` (Firestore
+    // rejects any document write containing one).
+    if (srStatusCode !== undefined) {
+      updateFields.shiprocketStatusCode = srStatusCode;
+    }
 
     if (isDelivered) {
       updateFields.status = 'Delivered';
